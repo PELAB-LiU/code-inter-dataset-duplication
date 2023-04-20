@@ -126,4 +126,13 @@ venv.bak/
 dmypy.json
 
 # Pyre type checker
+
+
 .pyre/
+/interduplication.db
+/bigclonebench/data.jsonl
+
+
+
+
+.idea/
