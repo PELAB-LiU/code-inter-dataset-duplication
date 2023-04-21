@@ -1,0 +1,4 @@
+
+id: bigclonebench
+url: 'https://github.com/microsoft/CodeXGLUE/tree/main/Code-Code/Clone-detection-BigCloneBench'
+tasks: codeclone

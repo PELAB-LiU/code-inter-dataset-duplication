@@ -11,7 +11,9 @@ CREATE TABLE snippets (
 	dataset TEXT NOT NULL,
 	language TEXT NOT NULL,
 	tokens TEXT NOT NULL,
-	partition TEXT NOT NULL,
+	filtered_tokens TEXT NOT NULL,
+	partition TEXT,
+	id_within_dataset TEXT,
 	FOREIGN KEY (dataset)
     REFERENCES datasets (id)
 );
