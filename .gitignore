@@ -136,3 +136,7 @@ dmypy.json
 
 
 .idea/
+/poj104/test.jsonl
+/poj104/train.jsonl
+/poj104/valid.jsonl
+/java-small/java-small/
