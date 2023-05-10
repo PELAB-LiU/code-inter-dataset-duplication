@@ -1,19 +1,15 @@
 CREATE TABLE datasets (
 	id TEXT PRIMARY KEY,
-	url TEXT NOT NULL,
-	tasks TEXT NOT NULL
+	url TEXT NOT NULL
 );
 
 CREATE TABLE snippets (
 	id integer primary key autoincrement,
 	snippet TEXT NOT NULL,
-	nl TEXT,
 	dataset TEXT NOT NULL,
 	language TEXT NOT NULL,
 	tokens TEXT NOT NULL,
-	filtered_tokens TEXT NOT NULL,
-	partition TEXT,
-	id_within_dataset TEXT,
+	id_within_dataset integer NOT NULL,
 	FOREIGN KEY (dataset)
     REFERENCES datasets (id)
 );

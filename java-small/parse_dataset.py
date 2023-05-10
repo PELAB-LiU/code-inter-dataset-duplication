@@ -1,6 +1,7 @@
 import glob
 import json
 
+import javalang
 import javalang as jl
 from tqdm import tqdm
 
@@ -46,15 +47,31 @@ snippets = []
 for f in tqdm(glob.glob('java-small/**/*.java', recursive=True)):
     with open(f, 'r') as file:
         contents = file.read()
-    tree = jl.parse.parse(contents)
+    try:
+        tree = jl.parse.parse(contents)
+    except:
+        print('Error parsing file: ' + f)
+        continue
     for _, node in tree.filter(jl.tree.MethodDeclaration):
-        start, end = __get_start_end_for_node(node)
-        snippets.append(__get_string(start, end, contents))
+        try:
+            start, end = __get_start_end_for_node(node)
+            snippets.append(__get_string(start, end, contents))
+        except:
+            print('Error parsing a method in: ' + f)
+            continue
     for _, node in tree.filter(jl.tree.ConstructorDeclaration):
-        start, end = __get_start_end_for_node(node)
-        snippets.append(__get_string(start, end, contents))
+        try:
+            start, end = __get_start_end_for_node(node)
+            snippets.append(__get_string(start, end, contents))
+        except:
+            print('Error parsing a constructor in: ' + f)
+            continue
 
 with open('data.jsonl', 'w') as file:
     for i, snippet in enumerate(snippets):
-        json_string = json.dumps({"idx": i, "func": snippet})
+        tokens = javalang.tokenizer.tokenize(snippet)
+        tokens = [str(t.value) for t in tokens]
+        json_string = json.dumps({"id_within_dataset": i,
+                                  "snippet": snippet,
+                                  "tokens": tokens})
         file.write(json_string + '\n')
