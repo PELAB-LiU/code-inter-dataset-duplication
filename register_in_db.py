@@ -2,7 +2,6 @@ import argparse
 import json
 import sqlite3
 
-import javalang
 import yaml
 from tqdm import tqdm
 

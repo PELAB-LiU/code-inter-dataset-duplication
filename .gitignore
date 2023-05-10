@@ -144,3 +144,4 @@ dmypy.json
 /bigclonebench/test.txt
 /bigclonebench/train.txt
 /bigclonebench/valid.txt
+/bigclonebench.db
