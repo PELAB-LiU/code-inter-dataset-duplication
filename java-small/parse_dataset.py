@@ -44,29 +44,33 @@ def __get_string(start, end, raw_content):
 
 
 snippets = []
+error_files = 0
 for f in tqdm(glob.glob('java-small/**/*.java', recursive=True)):
-    with open(f, 'r') as file:
-        contents = file.read()
     try:
+        with open(f, 'r') as file:
+            contents = file.read()
+
         tree = jl.parse.parse(contents)
+        for _, node in tree.filter(jl.tree.MethodDeclaration):
+            try:
+                start, end = __get_start_end_for_node(node)
+                snippets.append(__get_string(start, end, contents))
+            except:
+                print('Error parsing a method in: ' + f)
+                continue
+        for _, node in tree.filter(jl.tree.ConstructorDeclaration):
+            try:
+                start, end = __get_start_end_for_node(node)
+                snippets.append(__get_string(start, end, contents))
+            except:
+                print('Error parsing a constructor in: ' + f)
+                continue
     except:
         print('Error parsing file: ' + f)
+        error_files += 1
         continue
-    for _, node in tree.filter(jl.tree.MethodDeclaration):
-        try:
-            start, end = __get_start_end_for_node(node)
-            snippets.append(__get_string(start, end, contents))
-        except:
-            print('Error parsing a method in: ' + f)
-            continue
-    for _, node in tree.filter(jl.tree.ConstructorDeclaration):
-        try:
-            start, end = __get_start_end_for_node(node)
-            snippets.append(__get_string(start, end, contents))
-        except:
-            print('Error parsing a constructor in: ' + f)
-            continue
 
+print(f'Error files: {error_files}')
 with open('data.jsonl', 'w') as file:
     for i, snippet in enumerate(snippets):
         tokens = javalang.tokenizer.tokenize(snippet)

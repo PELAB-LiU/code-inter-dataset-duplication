@@ -145,3 +145,5 @@ dmypy.json
 /bigclonebench/train.txt
 /bigclonebench/valid.txt
 /bigclonebench.db
+/java-small/data.jsonl
+/codesearchnet/data.jsonl

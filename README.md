@@ -40,7 +40,7 @@ python parse_dataset.py
 Indexing in the databases.
 ```shell
 cd ..
-python register_in_db.py --data java-small/data.jsonl --meta bigclonebench/java-small.yaml
+python register_in_db.py --data java-small/data.jsonl --meta java-small/metadata.yaml
 ```
 
 
@@ -49,6 +49,18 @@ python register_in_db.py --data java-small/data.jsonl --meta bigclonebench/java-
 ```shell
 cd codesearchnet
 ./download.sh
+python parse_dataset.py
 ```
 
+Indexing in the databases.
+```shell
+cd ..
+python register_in_db.py --data codesearchnet/data.jsonl --meta codesearchnet/metadata.yaml 
+```
+
+
+## Compute duplicates
+```shell
+python compute_duplicates.py --lang java
+```
 
