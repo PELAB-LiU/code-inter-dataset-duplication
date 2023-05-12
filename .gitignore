@@ -147,3 +147,5 @@ dmypy.json
 /bigclonebench.db
 /java-small/data.jsonl
 /codesearchnet/data.jsonl
+/python-150/descriptions.txt
+/python-150/snippets.txt
