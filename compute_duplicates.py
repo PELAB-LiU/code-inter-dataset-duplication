@@ -7,7 +7,7 @@ import pandas as pd
 from dpu_utils.codeutils.deduplication import DuplicateDetector
 from tqdm import tqdm
 
-LANGUAGES = ['java']
+LANGUAGES = ['java', 'python']
 
 
 def register_database(duplicates, conn):

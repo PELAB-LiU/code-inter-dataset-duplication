@@ -59,8 +59,23 @@ python register_in_db.py --data codesearchnet/data.jsonl --meta codesearchnet/me
 ```
 
 
+## Python-150
+    
+```shell
+cd python-150
+./download.sh
+python parse_dataset.py
+```
+
+Indexing in the databases.
+```shell
+cd ..
+python register_in_db.py --data python-150/data.jsonl --meta python-150/metadata.yaml 
+```
+
+
 ## Compute duplicates
 ```shell
-python compute_duplicates.py --lang java
+python compute_duplicates.py --lang java|python
 ```
 

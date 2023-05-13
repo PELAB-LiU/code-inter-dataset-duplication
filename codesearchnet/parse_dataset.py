@@ -49,7 +49,7 @@ def load_local_dataset(lang="all", path="data"):
 
 
 def load_unimodal(lang="java"):
-    with open(f'data/java/{lang}_dedupe_definitions_v2.pkl', 'rb') as f:
+    with open(f'data/{lang}/{lang}_dedupe_definitions_v2.pkl', 'rb') as f:
         # Load the dictionary from the file
         my_dict = pickle.load(f)
     return pd.DataFrame(my_dict)
@@ -64,7 +64,7 @@ def load_datasets(lang="java"):
     return multimodal, unimodal
 
 
-multimodal, unimodal = load_datasets(lang="java")
+multimodal, unimodal = load_datasets(lang="python")
 
 with open('data.jsonl', 'w') as file:
     i = 0
