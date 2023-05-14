@@ -150,3 +150,5 @@ dmypy.json
 /python-150/descriptions.txt
 /python-150/snippets.txt
 /python-150/data.jsonl
+/cosqa/cosqa-all.json
+/cosqa/data.jsonl
