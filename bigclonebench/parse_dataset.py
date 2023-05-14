@@ -19,6 +19,7 @@ new_dataset = []
 for data in tqdm(dataset):
     tokens = javalang.tokenizer.tokenize(data['func'])
     tokens = [str(t.value) for t in tokens]
+    # TODO: use utils functions
     new_dataset.append({'snippet': data['func'],
                         'tokens': tokens,
                         'id_within_dataset': int(data['idx'])})

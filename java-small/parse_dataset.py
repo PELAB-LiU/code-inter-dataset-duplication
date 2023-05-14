@@ -71,6 +71,7 @@ for f in tqdm(glob.glob('java-small/**/*.java', recursive=True)):
         continue
 
 print(f'Error files: {error_files}')
+# TODO: use utils functions
 with open('data.jsonl', 'w') as file:
     for i, snippet in enumerate(snippets):
         tokens = javalang.tokenizer.tokenize(snippet)

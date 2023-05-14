@@ -1,11 +1,16 @@
 import glob
 import json
 import pickle
+import sys
 from pathlib import Path
 
 import pandas as pd
 from datasets import load_dataset, concatenate_datasets
 from tqdm import tqdm
+
+# setting path
+sys.path.append('..')
+from utils import get_tokens_from_snippet
 
 
 def load_local_dataset(lang="all", path="data"):
@@ -63,25 +68,22 @@ def load_datasets(lang="java"):
     unimodal = load_unimodal(lang=lang)
     return multimodal, unimodal
 
-
-multimodal, unimodal = load_datasets(lang="python")
+# TODO: java as well
+_, unimodal = load_datasets(lang="python")
 
 with open('data.jsonl', 'w') as file:
     i = 0
-    for _, data in tqdm(multimodal.iterrows()):
-        json_string = json.dumps({"id_within_dataset": i,
-                                  "snippet": data['code'],
-                                  "tokens": data['code_tokens'].tolist(),
-                                  "nl": data['docstring'],
-                                  "nl_tokens": data['docstring_tokens'].tolist(),
-                                  "language": data['language']})
-        i += 1
-        file.write(json_string + '\n')
     for _, data in tqdm(unimodal.iterrows()):
-        json_string = json.dumps({"id_within_dataset": i,
-                                  "snippet": data['function'],
-                                  "tokens": data['function_tokens'],
-                                  "language": data['language']})
+        try:
+            json_string = json.dumps({"id_within_dataset": i,
+                                      "snippet": data['function'],
+                                      "tokens": get_tokens_from_snippet(data['function'],
+                                                                        data['language']),
+                                      "language": data['language'],
+                                      "nl": data['docstring']})
+        except:
+            print(f'Failed to parse snippet {i}')
+            continue
         file.write(json_string + '\n')
         i += 1
 
