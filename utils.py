@@ -1,6 +1,6 @@
 import tokenize
 import io
-from typing import re
+import re
 
 import javalang
 

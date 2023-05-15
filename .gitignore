@@ -152,3 +152,12 @@ dmypy.json
 /python-150/data.jsonl
 /cosqa/cosqa-all.json
 /cosqa/data.jsonl
+/code-trans/test.java-cs.txt.cs
+/code-trans/test.java-cs.txt.java
+/code-trans/train.java-cs.txt.cs
+/code-trans/train.java-cs.txt.java
+/code-trans/valid.java-cs.txt.cs
+/code-trans/valid.java-cs.txt.java
+/code-trans/all.cs
+/code-trans/all.java
+/code-trans/data.jsonl
