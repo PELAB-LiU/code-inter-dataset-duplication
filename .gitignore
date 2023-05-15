@@ -161,3 +161,5 @@ dmypy.json
 /code-trans/all.cs
 /code-trans/all.java
 /code-trans/data.jsonl
+/codesearchnet/python_dedupe_definitions_v2.pkl
+/codesearchnet/java_dedupe_definitions_v2.pkl

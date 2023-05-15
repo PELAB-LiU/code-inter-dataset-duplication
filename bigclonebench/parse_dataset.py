@@ -1,7 +1,10 @@
 import json
+import sys
 
-import javalang
 from tqdm import tqdm
+
+sys.path.append('..')
+from utils import get_tokens_from_snippet
 
 FILE = 'data.jsonl'
 
@@ -17,9 +20,11 @@ dataset = load_dataset(FILE)
 new_dataset = []
 
 for data in tqdm(dataset):
-    tokens = javalang.tokenizer.tokenize(data['func'])
-    tokens = [str(t.value) for t in tokens]
-    # TODO: use utils functions
+    try:
+        tokens = get_tokens_from_snippet(data['func'], 'java')
+    except:
+        print(f'Error with {data["idx"]}')
+        continue
     new_dataset.append({'snippet': data['func'],
                         'tokens': tokens,
                         'id_within_dataset': int(data['idx'])})
