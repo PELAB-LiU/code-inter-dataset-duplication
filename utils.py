@@ -82,3 +82,59 @@ def get_tokens_from_snippet(snippet, language):
         return get_tokens_from_java_snippet(snippet_without_comments)
     else:
         raise ValueError(f'Language {language} not supported')
+
+
+def __get_start_end_for_node(node_to_find, tree):
+    start = None
+    end = None
+    for path, node in tree:
+        if start is not None and node_to_find not in path:
+            end = node.position
+            return start, end
+        if start is None and node == node_to_find:
+            start = node.position
+    return start, end
+
+
+def __get_string(start, end, raw_content):
+    if start is None:
+        return ""
+
+    # positions are all offset by 1. e.g. first line -> lines[0], start.line = 1
+    end_pos = None
+
+    if end is not None:
+        end_pos = end.line - 1
+
+    lines = raw_content.splitlines(True)
+    string = "".join(lines[start.line:end_pos])
+    string = lines[start.line - 1] + string
+
+    # When the method is the last one, it will contain a additional brace
+    if end is None:
+        left = string.count("{")
+        right = string.count("}")
+        if right - left == 1:
+            p = string.rfind("}")
+            string = string[:p]
+
+    return string
+
+
+def get_methods_java(contents):
+    snippets = []
+    tree = javalang.parse.parse(contents)
+    for _, node in tree.filter(javalang.tree.MethodDeclaration):
+        try:
+            start, end = __get_start_end_for_node(node, tree)
+            snippets.append(__get_string(start, end, contents))
+        except:
+            continue
+
+    for _, node in tree.filter(javalang.tree.ConstructorDeclaration):
+        try:
+            start, end = __get_start_end_for_node(node, tree)
+            snippets.append(__get_string(start, end, contents))
+        except:
+            continue
+    return snippets

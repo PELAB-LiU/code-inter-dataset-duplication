@@ -6,7 +6,7 @@ import javalang as jl
 from tqdm import tqdm
 
 
-def __get_start_end_for_node(node_to_find):
+def __get_start_end_for_node(node_to_find, tree):
     start = None
     end = None
     for path, node in tree:
@@ -53,14 +53,14 @@ for f in tqdm(glob.glob('java-small/**/*.java', recursive=True)):
         tree = jl.parse.parse(contents)
         for _, node in tree.filter(jl.tree.MethodDeclaration):
             try:
-                start, end = __get_start_end_for_node(node)
+                start, end = __get_start_end_for_node(node, tree)
                 snippets.append(__get_string(start, end, contents))
             except:
                 print('Error parsing a method in: ' + f)
                 continue
         for _, node in tree.filter(jl.tree.ConstructorDeclaration):
             try:
-                start, end = __get_start_end_for_node(node)
+                start, end = __get_start_end_for_node(node, tree)
                 snippets.append(__get_string(start, end, contents))
             except:
                 print('Error parsing a constructor in: ' + f)

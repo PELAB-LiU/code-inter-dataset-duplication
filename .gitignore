@@ -165,3 +165,4 @@ dmypy.json
 /codesearchnet/java_dedupe_definitions_v2.pkl
 /py150/py150_files/
 /javaCorpus/token_completion/
+/javaCorpus/data.jsonl
