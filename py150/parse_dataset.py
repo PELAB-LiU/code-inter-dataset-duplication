@@ -54,7 +54,6 @@ paths = [os.path.join(PREFIX, path).strip() for path in paths]
 all_data = []
 i = 0
 for path in tqdm(paths):
-
     try:
         methods = extract_method_snippets(path)
     except:

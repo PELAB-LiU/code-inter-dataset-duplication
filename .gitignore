@@ -166,3 +166,4 @@ dmypy.json
 /py150/py150_files/
 /javaCorpus/token_completion/
 /javaCorpus/data.jsonl
+/py150/data.jsonl
