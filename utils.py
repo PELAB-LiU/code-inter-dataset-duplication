@@ -1,6 +1,8 @@
-import tokenize
 import io
+import json
 import re
+import tokenize
+from collections import defaultdict
 
 import javalang
 
@@ -138,3 +140,33 @@ def get_methods_java(contents):
         except:
             continue
     return snippets
+
+
+def save_log(dictionary, log_path):
+    with open(log_path, 'w') as f:
+        json.dump(dictionary, f)
+
+
+class ParseLog:
+    def __init__(self):
+        self.log = defaultdict(int)
+
+    def register_fail_snippet(self):
+        self.log['fail_snippets'] += 1
+        self.log['total_snippets'] += 1
+
+    def register_success_snippet(self):
+        self.log['success_snippets'] += 1
+        self.log['total_snippets'] += 1
+
+    def register_fail_file(self):
+        self.log['fail_files'] += 1
+        self.log['total_files'] += 1
+
+    def register_success_file(self):
+        self.log['success_files'] += 1
+        self.log['total_files'] += 1
+
+    def save_log(self, path):
+        save_log(self.log, path)
+

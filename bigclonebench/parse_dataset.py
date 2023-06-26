@@ -4,9 +4,10 @@ import sys
 from tqdm import tqdm
 
 sys.path.append('..')
-from utils import get_tokens_from_snippet
+from utils import get_tokens_from_snippet, ParseLog
 
-FILE = 'data.jsonl'
+FILE = 'cxg_data.jsonl'
+OUT = 'data.jsonl'
 
 
 def load_dataset(path):
@@ -18,18 +19,22 @@ def load_dataset(path):
 
 dataset = load_dataset(FILE)
 new_dataset = []
-
+log = ParseLog()
 for data in tqdm(dataset):
     try:
         tokens = get_tokens_from_snippet(data['func'], 'java')
+        log.register_success_snippet()
     except:
         print(f'Error with {data["idx"]}')
+        log.register_fail_snippet()
         continue
     new_dataset.append({'snippet': data['func'],
                         'tokens': tokens,
                         'id_within_dataset': int(data['idx'])})
 
-with open(FILE, "w") as outfile:
+with open(OUT, "w") as outfile:
     for item in new_dataset:
         json.dump(item, outfile)
         outfile.write("\n")
+
+log.save_log('log.json')

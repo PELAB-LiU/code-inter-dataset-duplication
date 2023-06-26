@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 # setting path
 sys.path.append('..')
-from utils import get_tokens_from_snippet
+from utils import get_tokens_from_snippet, ParseLog
 
 
 def load_dataset(lang="java"):
@@ -18,6 +18,7 @@ def load_dataset(lang="java"):
 
 
 i = 0
+log = ParseLog()
 with open('data.jsonl', 'w') as file:
     for language in ['java', 'python']:
         dataset = load_dataset(lang=language)
@@ -29,10 +30,14 @@ with open('data.jsonl', 'w') as file:
                                                                             data['language']),
                                           "language": data['language'],
                                           "nl": data['docstring']})
+                i += 1
+                log.register_success_snippet()
             except:
-                print(f'Failed to parse snippet {i}')
+                print(f'Failed to parse a snippet. Skipping...')
+                log.register_fail_snippet()
                 continue
             file.write(json_string + '\n')
-            i += 1
 
     print(f'Wrote {i} snippets to data.jsonl')
+
+log.save_log('log.json')

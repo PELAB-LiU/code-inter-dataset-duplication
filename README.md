@@ -3,76 +3,22 @@
 Creation of empty database.
 ```shell
 sqlite3 interduplication.db < schema.sql
-sqlite3 bigclonebench.db < schema.sql
 ```
 
-## BigCloneBench
+## Download and index dataset
 
-Download and file generation (`data.jsonl`) and other files (note that this version comes from CodeXGlue).
+Download and file generation (`data.jsonl`) and other files.
 ```shell
-cd bigclonebench
+cd dataset_name
 ./download.sh
 python parse_dataset.py
 ```
 
-Indexing in the databases.
+Index in the database.
 ```shell
 cd ..
-python register_in_db.py --data bigclonebench/data.jsonl --meta bigclonebench/metadata.yaml
-python register_in_db.py --data bigclonebench/data.jsonl --meta bigclonebench/metadata.yaml --db bigclonebench.db
+python register_in_db.py --data dataset_name/data.jsonl --meta dataset_name/metadata.yaml
 ```
-
-Test method.
-```shell
-python compute_duplicates.py --lang java --db bigclonebench.db
-python bigclonebench/test_duplication_method.py 
-```
-
-
-## Java-(small|medium|large)
-
-```shell
-cd java-small
-./download.sh
-python parse_dataset.py
-```
-
-Indexing in the databases.
-```shell
-cd ..
-python register_in_db.py --data java-small/data.jsonl --meta java-small/metadata.yaml
-```
-
-
-## CodeSearchNet
-    
-```shell
-cd codesearchnet
-./download.sh
-python parse_dataset.py
-```
-
-Indexing in the databases.
-```shell
-cd ..
-python register_in_db.py --data codesearchnet/data.jsonl --meta codesearchnet/metadata.yaml 
-```
-
-
-## Python-150
-    
-```shell
-cd python-150
-./download.sh
-python parse_dataset.py
-```
-
-Indexing in the databases.
-```shell
-cd ..
-python register_in_db.py --data python-150/data.jsonl --meta python-150/metadata.yaml 
-```
-
 
 ## Compute duplicates
 ```shell

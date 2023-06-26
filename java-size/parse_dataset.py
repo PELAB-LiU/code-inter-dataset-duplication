@@ -1,42 +1,28 @@
-import ast
+import glob
 import json
-import os.path
 import sys
-from lib2to3 import refactor
 
 from tqdm import tqdm
 
 sys.path.append('..')
-from utils import get_tokens_from_snippet, get_methods_java, ParseLog
 
+from utils import ParseLog, get_methods_java, get_tokens_from_snippet
 
-def add_new_lines(code):
-    contents = code.split(' ')
-    new_contents = []
-    for token in contents:
-        new_contents.append(token)
-        if token == '}' or token == '{':
-            new_contents.append('\n')
-    return ' '.join(new_contents)
+contents = []
+log = ParseLog()
+for f in tqdm(glob.glob('java-med/**/*.java', recursive=True)):
+    try:
+        with open(f, 'r') as file:
+            content = file.read()
+    except:
+        log.register_fail_file()
+        continue
+    contents.append(content)
 
-
-PREFIX = 'token_completion'
-OUTPUT = 'data.jsonl'
-
-file_contents = []
-with open(f'{PREFIX}/test.txt', 'r') as file:
-    file_contents += file.readlines()
-with open(f'{PREFIX}/dev.txt', 'r') as file:
-    file_contents += file.readlines()
-with open(f'{PREFIX}/train.txt', 'r') as file:
-    file_contents += file.readlines()
 
 all_data = []
 i = 0
-log = ParseLog()
-for content in tqdm(file_contents):
-    content = ' '.join(content.split(' ')[1:-1])
-    content = add_new_lines(content)
+for content in tqdm(contents):
     try:
         methods = get_methods_java(content)
         log.register_success_file()
@@ -58,9 +44,10 @@ for content in tqdm(file_contents):
     if i % 1000 == 0 and i > 0:
         print(f'Parsed {i} methods')
 
-with open(OUTPUT, 'w') as f:
+with open('data.jsonl', 'w') as f:
     for item in all_data:
         json.dump(item, f)
         f.write('\n')
 
 log.save_log('log.json')
+
