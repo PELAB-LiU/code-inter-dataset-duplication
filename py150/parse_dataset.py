@@ -7,7 +7,7 @@ from lib2to3 import refactor
 from tqdm import tqdm
 
 sys.path.append('..')
-from utils import get_tokens_from_snippet
+from utils import get_tokens_from_snippet, ParseLog
 
 
 def convert_python2_to_python3(code):
@@ -53,10 +53,13 @@ paths = [os.path.join(PREFIX, path).strip() for path in paths]
 
 all_data = []
 i = 0
+log = ParseLog()
 for path in tqdm(paths):
     try:
         methods = extract_method_snippets(path)
+        log.register_success_file()
     except:
+        log.register_fail_file()
         print(f'Failed to parse snippet {path}')
         continue
     for _, body in methods:
@@ -65,11 +68,16 @@ for path in tqdm(paths):
                              "snippet": body,
                              "tokens": get_tokens_from_snippet(body, 'python')})
             i += 1
+            log.register_success_snippet()
         except:
             print(f'Failed to parse a method of snippet {path}')
+            log.register_fail_snippet()
             continue
 
 with open(OUTPUT, 'w') as f:
     for item in all_data:
         json.dump(item, f)
         f.write('\n')
+
+log.save_log('log.json')
+

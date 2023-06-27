@@ -1,5 +1,6 @@
 import glob
 import json
+import os
 import sys
 
 from tqdm import tqdm
@@ -11,18 +12,21 @@ from utils import ParseLog, get_methods_java, get_tokens_from_snippet
 contents = []
 log = ParseLog()
 for f in tqdm(glob.glob('java-med/**/*.java', recursive=True)):
+    if os.path.getsize(f) > 100 * 1024:
+        continue
     try:
         with open(f, 'r') as file:
             content = file.read()
     except:
         log.register_fail_file()
         continue
-    contents.append(content)
+    contents.append((f, content))
 
 
 all_data = []
 i = 0
-for content in tqdm(contents):
+for f, content in tqdm(contents):
+    print(f'Parsing {f}')
     try:
         methods = get_methods_java(content)
         log.register_success_file()
