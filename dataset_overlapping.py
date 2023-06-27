@@ -41,7 +41,7 @@ def ovelapping(G, source_dataset, target_dataset):
 
 def main(args):
     G = load_graph(args.db, args.lang)
-    datasets = set([d for n, d in G.nodes(data=True)])
+    datasets = set([d['dataset'] for n, d in G.nodes(data=True)])
     for source_dataset in tqdm(datasets, desc='Computing overlapping'):
         for target_dataset in datasets:
             if source_dataset != target_dataset:
