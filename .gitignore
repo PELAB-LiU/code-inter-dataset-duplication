@@ -174,3 +174,4 @@ log.json
 /java-med/java-large/
 /java-med/data.jsonl
 interduplicates.json
+*.bin
