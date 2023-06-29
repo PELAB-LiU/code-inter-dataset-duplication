@@ -33,3 +33,10 @@ json file for each dataset containing the snippets that are in codesearchnet and
 python dataset_overlapping.py --lang java|python
 ```
 
+## Running fine-tuning procedures
+
+Code search (default over python-150):
+```shell
+python code_search.py 
+```
+

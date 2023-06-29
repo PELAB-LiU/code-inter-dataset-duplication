@@ -202,7 +202,7 @@ def main():
     train(train_set=dataset["train"],
           model=dual_encoder_model,
           checkpoint=model_args.checkpoint,
-          batch_size_train=training_args.batch_size_eval,
+          batch_size_train=training_args.per_device_train_batch_size,
           lr=training_args.learning_rate,
           epochs=training_args.num_train_epochs,
           gradient_accumulation=training_args.gradient_accumulation_steps,
