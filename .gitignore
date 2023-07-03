@@ -180,3 +180,5 @@ representatives.json
 /codetrans_codet5/
 /python-150/data_parsed_nl.jsonl
 /corpus_analysis.py
+/tlc/data.pkl
+/tlc/data.jsonl
