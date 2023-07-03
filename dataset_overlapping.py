@@ -46,7 +46,7 @@ def ovelapping(G, source_dataset, target_dataset):
             result.append(n2)
             ids_within_dataset.append(G_filtered.nodes[n2]['id_within_dataset'])
     assert len(set(result)) == len(set(ids_within_dataset))
-    return len(set(result)) / len([n for n in G_filtered.nodes if G_filtered.nodes[n]['dataset'] == source_dataset]),\
+    return len(set(result)) / len([n for n in G_filtered.nodes if G_filtered.nodes[n]['dataset'] == source_dataset]), \
         list(set(ids_within_dataset))
 
 
@@ -64,7 +64,7 @@ def get_representative(G):
 
 def main(args):
     G = load_graph(args.db, args.lang)
-    # G = get_representative(G)
+    G = get_representative(G)
     datasets = set([d['dataset'] for n, d in G.nodes(data=True)])
     target_dataset = args.target_dataset
     for source_dataset in tqdm(datasets, desc='Computing overlapping'):
@@ -73,6 +73,9 @@ def main(args):
             print(f'{source_dataset} - {target_dataset}: {overlap}')
             with open(os.path.join(source_dataset, 'interduplicates.json'), 'w') as f:
                 json.dump(nodes, f)
+            with open(os.path.join(source_dataset, 'representatives.json'), 'w') as f:
+                json.dump([d['id_within_dataset'] for n, d in G.nodes(data=True)
+                           if d['dataset'] == source_dataset], f)
 
 
 if __name__ == '__main__':

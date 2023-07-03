@@ -175,3 +175,8 @@ log.json
 /java-med/data.jsonl
 interduplicates.json
 *.bin
+representatives.json
+/python-150_codet5/
+/codetrans_codet5/
+/python-150/data_parsed_nl.jsonl
+/corpus_analysis.py

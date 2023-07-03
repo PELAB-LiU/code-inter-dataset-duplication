@@ -43,10 +43,13 @@ class DualEncoderModel(nn.Module):
 COLUMN_INTER_DUPLICATED = "is_inter_duplicated"
 
 
-def load_splits(data_path, interduplicates_path, test_size, seed):
+def load_splits(data_path, interduplicates_path, representatives_path, test_size, seed):
     dataset = load_dataset('json', data_files=data_path)
     with open(interduplicates_path) as f:
         interduplicates = set(json.load(f))
+    with open(representatives_path) as f:
+        representatives = set(json.load(f))
+    dataset = dataset.filter(lambda example: example["id_within_dataset"] in representatives)
     dataset = dataset.map(lambda example: {
         COLUMN_INTER_DUPLICATED: example["id_within_dataset"] in interduplicates
     }, remove_columns="id_within_dataset")
@@ -178,7 +181,8 @@ def main():
     dual_encoder_model = DualEncoderModel(model, model)
     tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)
 
-    dataset = load_splits(data_args.data_path, data_args.interduplicates_path, data_args.test_size, training_args.seed)
+    dataset = load_splits(data_args.data_path, data_args.interduplicates_path, data_args.representatives_path,
+                          data_args.test_size, training_args.seed)
     dataset = dataset.remove_columns([c for c in dataset["train"].column_names if c not in
                                       [data_args.tokens_column, data_args.nl_column, COLUMN_INTER_DUPLICATED]])
     dataset = dataset.map(lambda example: {data_args.tokens_column: ' '.join(example[data_args.tokens_column])})
@@ -209,18 +213,19 @@ def main():
           max_grad_norm=training_args.max_grad_norm,
           log_steps=training_args.logging_steps,
           input_ids_code='input_ids_tokens',
-          inputs_ids_nl='input_ids_nl',
+          inputs_ids_nl='input_ids_nl_parsed',
           attention_mask_code='attention_mask_tokens',
-          attention_mask_nl='attention_mask_nl')
+          attention_mask_nl='attention_mask_nl_parsed')
     rrs = evaluate(eval_dataset=full_test_dataset,
                    model=dual_encoder_model,
                    batch_size_eval=training_args.batch_size_eval,
                    input_ids_code='input_ids_tokens',
-                   inputs_ids_nl='input_ids_nl',
+                   inputs_ids_nl='input_ids_nl_parsed',
                    attention_mask_code='attention_mask_tokens',
-                   attention_mask_nl='attention_mask_nl')
+                   attention_mask_nl='attention_mask_nl_parsed')
     mrrs = {x: np.mean(y) for x, y in rrs.items()}
     logger.info(f'MRRs: {mrrs}')
+    logger.info(f'Full mrr: {np.mean(rrs[0] + rrs[1]):.4f}')
     logger.info(f'T-test: {ttest_ind(rrs[0], rrs[1]).pvalue:.4f}')
     logger.info(f'Cohen d: {cohend(rrs[0], rrs[1]):.4f}')
 

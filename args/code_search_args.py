@@ -4,17 +4,19 @@ from typing import Optional
 
 @dataclass
 class ModelArguments:
-    model_name_or_path: Optional[str] = field(default="microsoft/codebert-base")
-    checkpoint: str = field(default='python-150_codebert.bin')
+    model_name_or_path: Optional[str] = field(default="microsoft/unixcoder-base")
+    checkpoint: str = field(default='python-150_unixcoder.bin')
 
 
 @dataclass
 class DataArguments:
-    data_path: str = field(default='python-150/data.jsonl', metadata={"help": "Path to the dataset."})
+    data_path: str = field(default='python-150/data_parsed_nl.jsonl', metadata={"help": "Path to the dataset."})
     interduplicates_path: str = field(default='python-150/interduplicates.json',
-                                      metadata={"help": "Path to the dataset."})
+                                      metadata={"help": "Path to the interduplicates."})
+    representatives_path: str = field(default='python-150/representatives.json',
+                                      metadata={"help": "Path to the representatives."})
     tokens_column: str = field(default="tokens", metadata={"help": "Name of the tokens column."})
-    nl_column: str = field(default="nl", metadata={"help": "Name of the description column."})
+    nl_column: str = field(default="nl_parsed", metadata={"help": "Name of the description column."})
     test_size: float = field(default=0.3)
 
 
