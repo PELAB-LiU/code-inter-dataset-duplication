@@ -182,3 +182,9 @@ representatives.json
 /corpus_analysis.py
 /tlc/data.pkl
 /tlc/data.jsonl
+/python-150/data_ps.declbodies.test
+/python-150/data_ps.declbodies.train
+/python-150/data_ps.declbodies.valid
+/python-150/data_ps.descriptions.test
+/python-150/data_ps.descriptions.train
+/python-150/data_ps.descriptions.valid

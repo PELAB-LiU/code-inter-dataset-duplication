@@ -42,6 +42,6 @@ python code_search.py
 
 ## TODOs
 
-- Python 150 take the original version and maybe preprocess comments
-- Lists of datasets
+- Scripts training
+- Scripts upload to hf
 
