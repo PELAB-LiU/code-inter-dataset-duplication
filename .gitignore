@@ -188,3 +188,5 @@ representatives.json
 /python-150/data_ps.descriptions.test
 /python-150/data_ps.descriptions.train
 /python-150/data_ps.descriptions.valid
+/fcm/data.pkl
+/fcm/data.jsonl

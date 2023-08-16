@@ -64,7 +64,7 @@ def get_representative(G):
 
 def main(args):
     G = load_graph(args.db, args.lang)
-    G = get_representative(G)
+    # G = get_representative(G)
     datasets = set([d['dataset'] for n, d in G.nodes(data=True)])
     target_dataset = args.target_dataset
     for source_dataset in tqdm(datasets, desc='Computing overlapping'):
