@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  neo4j:
+    image: neo4j
+    environment:
+      - NEO4J_AUTH=none
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - data_container:/var/lib/neo4j/data
+
+volumes:
+  data_container:
+  conf_container:
+  import_container:
