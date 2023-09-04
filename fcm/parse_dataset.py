@@ -26,7 +26,8 @@ for key in data:
             all_data.append({"id_within_dataset": i,
                              "snippet": code,
                              "tokens": get_tokens_from_snippet(code, 'java'),
-                             "nl": nl})
+                             "nl": nl,
+                             "split_within_dataset": key if key != 'val' else 'valid'})
             i += 1
             log.register_success_snippet()
         except:

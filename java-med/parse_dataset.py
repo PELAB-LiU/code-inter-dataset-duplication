@@ -27,6 +27,12 @@ all_data = []
 i = 0
 for f, content in tqdm(contents):
     print(f'Parsing {f}')
+    if f.startswith('java-med/validation'):
+        split = 'valid'
+    elif f.startswith('java-med/test'):
+        split = 'test'
+    else:
+        split = 'train'
     try:
         methods = get_methods_java(content)
         log.register_success_file()
@@ -38,7 +44,8 @@ for f, content in tqdm(contents):
         try:
             all_data.append({"id_within_dataset": i,
                              "snippet": body,
-                             "tokens": get_tokens_from_snippet(body, 'java')})
+                             "tokens": get_tokens_from_snippet(body, 'java'),
+                             "split_within_dataset": split})
             i += 1
             log.register_success_snippet()
         except:

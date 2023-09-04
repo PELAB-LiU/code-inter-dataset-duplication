@@ -35,9 +35,10 @@ def register_database(database, dataset, metadata):
                          metadata['id'],
                          data['language'] if 'language' in data else metadata['language'],
                          data['id_within_dataset'],
-                         json.dumps(data['tokens']))
+                         json.dumps(data['tokens']),
+                         data['split_within_dataset'] if 'split_within_dataset' in data else None)
         cursor.execute("INSERT INTO snippets (snippet, dataset, "
-                       "language, id_within_dataset, tokens) VALUES (?, ?, ?, ?, ?)",
+                       "language, id_within_dataset, tokens, split_within_dataset) VALUES (?, ?, ?, ?, ?, ?)",
                        tuple_snippet)
     conn.commit()
     conn.close()

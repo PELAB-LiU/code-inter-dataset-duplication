@@ -44,35 +44,38 @@ def extract_method_snippets(file_path):
 PREFIX = 'py150_files'
 OUTPUT = 'data.jsonl'
 
-paths = []
+paths = {}
 with open('py150_files/python50k_eval.txt', 'r') as file:
-    paths += file.readlines()
+    paths["test"] = file.readlines()
+    paths["test"] = [os.path.join(PREFIX, path).strip() for path in paths["test"]]
 with open('py150_files/python100k_train.txt', 'r') as file:
-    paths += file.readlines()
-paths = [os.path.join(PREFIX, path).strip() for path in paths]
+    paths["train"] = file.readlines()
+    paths["train"] = [os.path.join(PREFIX, path).strip() for path in paths["train"]]
 
 all_data = []
 i = 0
 log = ParseLog()
-for path in tqdm(paths):
-    try:
-        methods = extract_method_snippets(path)
-        log.register_success_file()
-    except:
-        log.register_fail_file()
-        print(f'Failed to parse snippet {path}')
-        continue
-    for _, body in methods:
+for split in paths:
+    for path in tqdm(paths[split], desc=f'Parsing {split} split'):
         try:
-            all_data.append({"id_within_dataset": i,
-                             "snippet": body,
-                             "tokens": get_tokens_from_snippet(body, 'python')})
-            i += 1
-            log.register_success_snippet()
+            methods = extract_method_snippets(path)
+            log.register_success_file()
         except:
-            print(f'Failed to parse a method of snippet {path}')
-            log.register_fail_snippet()
+            log.register_fail_file()
+            print(f'Failed to parse snippet {path}')
             continue
+        for _, body in methods:
+            try:
+                all_data.append({"id_within_dataset": i,
+                                 "snippet": body,
+                                 "tokens": get_tokens_from_snippet(body, 'python'),
+                                 "split_within_dataset": split})
+                i += 1
+                log.register_success_snippet()
+            except:
+                print(f'Failed to parse a method of snippet {path}')
+                log.register_fail_snippet()
+                continue
 
 with open(OUTPUT, 'w') as f:
     for item in all_data:

@@ -28,7 +28,8 @@ for split in SPLITS:
                 all_data.append({"id_within_dataset": i,
                                  "snippet": code,
                                  "tokens": get_tokens_from_snippet(code, 'python'),
-                                 "nl": description})
+                                 "nl": description,
+                                 "split_within_dataset": split})
                 i += 1
                 log.register_success_snippet()
             except:

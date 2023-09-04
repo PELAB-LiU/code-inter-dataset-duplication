@@ -10,6 +10,7 @@ CREATE TABLE snippets (
 	language TEXT NOT NULL,
 	tokens TEXT NOT NULL,
 	id_within_dataset integer NOT NULL,
+	split_within_dataset TEXT,
 	FOREIGN KEY (dataset)
     REFERENCES datasets (id)
 );
