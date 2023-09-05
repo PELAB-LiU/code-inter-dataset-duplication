@@ -35,10 +35,18 @@ python dataset_overlapping.py --lang java|python
 
 ## Running fine-tuning procedures
 
-Code search (default over python-150):
 ```shell
-python code_search.py 
+cd seq2seq
 ```
+
+Code translation:
+```shell
+./train_codetrans.sh
+./evaluate_codetrans.sh
+```
+
+Code documentation:
+
 
 ## TODOs
 
