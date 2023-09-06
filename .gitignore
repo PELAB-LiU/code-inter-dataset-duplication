@@ -191,3 +191,4 @@ representatives.json
 /fcm/data.pkl
 /fcm/data.jsonl
 /seq2seq/codebertrand_java2csharp/
+/seq2seq/codebertrand_code2text_tlc/
