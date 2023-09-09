@@ -36,6 +36,8 @@ def main():
     gold = []
     no_dup_preds = []
     no_dup_gold = []
+    dup_preds = []
+    dup_gold = []
     for i in tqdm(range(len(dataset)), desc='Pred loop'):
         is_duplicated = dataset[i]['is_duplicated']
         attn = torch.tensor([dataset[i]['attention_mask']]).cuda()
@@ -51,12 +53,18 @@ def main():
         if not is_duplicated:
             no_dup_gold.append(truth.strip())
             no_dup_preds.append(pred.strip())
+        else:
+            dup_gold.append(truth.strip())
+            dup_preds.append(pred.strip())
 
     save_list(preds, os.path.join(eval_args.checkpoint, 'predictions_full.txt'), eval_args.include_idx)
     save_list(gold, os.path.join(eval_args.checkpoint, 'references_full.txt'), eval_args.include_idx)
 
     save_list(no_dup_preds, os.path.join(eval_args.checkpoint, 'predictions_no_dup.txt'), eval_args.include_idx)
     save_list(no_dup_gold, os.path.join(eval_args.checkpoint, 'references_no_dup.txt'), eval_args.include_idx)
+
+    save_list(dup_preds, os.path.join(eval_args.checkpoint, 'predictions_dup.txt'), eval_args.include_idx)
+    save_list(dup_gold, os.path.join(eval_args.checkpoint, 'references_dup.txt'), eval_args.include_idx)
 
 
 if __name__ == '__main__':

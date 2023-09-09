@@ -1,8 +1,8 @@
 
 python generate_predictions.py \
-  --checkpoint "codebertrand_code2text_tlc/best_checkpoint" \
-  --tokenizer_source "microsoft/codebert-base" \
-  --tokenizer_target "microsoft/codebert-base" \
+  --checkpoint "robertarand_code2text_tlc/best_checkpoint" \
+  --tokenizer_source "roberta-base" \
+  --tokenizer_target "roberta-base" \
   --data_path_hf "antolin/tlc_interduplication" \
   --source_column "tokens" \
   --is_split_source \

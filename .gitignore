@@ -192,3 +192,6 @@ representatives.json
 /fcm/data.jsonl
 /seq2seq/codebertrand_java2csharp/
 /seq2seq/codebertrand_code2text_tlc/
+/seq2seq/codebertrand_code2text_python-150/
+/seq2seq/robertarand_code2text_tlc/
+/seq2seq/robertarand_java2csharp/

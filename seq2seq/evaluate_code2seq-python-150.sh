@@ -1,9 +1,9 @@
 
 python generate_predictions.py \
-  --checkpoint "codebertrand_code2text_tlc/best_checkpoint" \
+  --checkpoint "codebertrand_code2text_python-150/best_checkpoint" \
   --tokenizer_source "microsoft/codebert-base" \
   --tokenizer_target "microsoft/codebert-base" \
-  --data_path_hf "antolin/tlc_interduplication" \
+  --data_path_hf "antolin/python-150_interduplication" \
   --source_column "tokens" \
   --is_split_source \
   --target_column "nl" \
