@@ -25,6 +25,10 @@ for split in SPLITS:
             description = re.sub(' +', ' ', description).replace(SPACE_TOKEN, ' ').replace(NEW_LINE_TOKEN, '\n')[1:-2]
             code = re.sub(' +', ' ', code).replace(SPACE_TOKEN, ' ').replace(NEW_LINE_TOKEN, '\n')
             try:
+                if description == "":
+                    print(f'Empty description. Skipping...')
+                    continue
+                description = ' '.join(description.split())
                 all_data.append({"id_within_dataset": i,
                                  "snippet": code,
                                  "tokens": get_tokens_from_snippet(code, 'python'),
