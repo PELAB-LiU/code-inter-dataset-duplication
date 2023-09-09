@@ -69,7 +69,7 @@ def cook_refs(refs, n=4):
 
 
 def cook_test(test, item, n=4):
-    '''Takes a test sentence and returns an object that
+    '''Takes a test sentence and returnss an object that
     encapsulates everything that BLEU needs to know about it.'''
     (reflens, refmaxcounts) = item
     test = normalize(test)
