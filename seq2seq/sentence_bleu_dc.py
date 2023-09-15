@@ -1,5 +1,8 @@
 import argparse
 import os
+import pickle
+import random
+import string
 
 import nltk
 import numpy as np
@@ -21,7 +24,8 @@ def nltk_sentence_bleu(hypothesis, reference):
 
 def get_normalization(task):
     if task == 'code2text':
-        return lambda s: normalize(splitPuncts(s.strip()))
+        return lambda s: normalize(
+            splitPuncts(s.strip()))  # [j for j in normalize(splitPuncts(s.strip())) if j not in string.punctuation]
     elif task == 'codetrans':
         return lambda s: s.strip().split()
 
@@ -57,12 +61,29 @@ def main(args):
     references_full, predictions_full = read_data(args.data_folder, 'full', normalization)
     references_dup, predictions_dup = read_data(args.data_folder, 'dup', normalization)
     references_no_dup, predictions_no_dup = read_data(args.data_folder, 'no_dup', normalization)
+    random.seed(args.seed)
+    combined_lists = list(zip(references_full, predictions_full))
+    random.shuffle(combined_lists)
+    references_ran, predictions_ran = zip(*combined_lists)
+    references_ran, predictions_ran = references_ran[0:len(references_dup)], predictions_ran[0:len(predictions_dup)]
+    assert len(references_dup) == len(predictions_dup)
+    assert len(references_full) == len(predictions_full)
+    assert len(references_no_dup) == len(predictions_no_dup)
+
     bleu_full = [nltk_sentence_bleu(p, r) for p, r in zip(predictions_full, references_full)]
     bleu_dup = [nltk_sentence_bleu(p, r) for p, r in zip(predictions_dup, references_dup)]
     bleu_no_dup = [nltk_sentence_bleu(p, r) for p, r in zip(predictions_no_dup, references_no_dup)]
+    bleu_rand = [nltk_sentence_bleu(p, r) for p, r in zip(predictions_ran, references_ran)]
+
     print(f'BLEU FULL: {np.mean(bleu_full) * 100:.2f}')
     print(f'BLEU NO DUP: {np.mean(bleu_no_dup) * 100:.2f}')
     print(f'BLEU DUP: {np.mean(bleu_dup) * 100:.2f}')
+    # print(f'BLEU RAN: {np.mean(bleu_rand) * 100:.2f}')
+
+    print(
+        f'Length ref DUP: {np.mean([len(r) for r in references_dup]):.2f} +- {np.std([len(r) for r in references_dup]):.2f}')
+    print(
+        f'Length ref NO DUP: {np.mean([len(r) for r in references_no_dup]):.2f} +- {np.std([len(r) for r in references_no_dup]):.2f}')
 
     pval = ttest_ind(bleu_no_dup, bleu_dup).pvalue
     print(f'p-value: {pval:.4f}')
@@ -73,5 +94,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_folder', type=str, required=True)
     parser.add_argument('--task', choices=['codetrans', 'code2text'])
+    parser.add_argument('--seed', default=123)
     args = parser.parse_args()
     main(args)
