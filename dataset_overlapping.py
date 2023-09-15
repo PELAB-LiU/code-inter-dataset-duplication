@@ -81,16 +81,16 @@ def get_representative(G):
 
 def main(args):
     G = load_graph(args.db, args.lang)
-    # G = get_representative(G)
+    G = get_representative(G)
     datasets = set([d['dataset'] for n, d in G.nodes(data=True) if d['dataset'] != args.target_dataset])
     target_dataset = args.target_dataset
     for source_dataset in tqdm(datasets, desc='Computing overlapping'):
         nodes = overlapping(G, source_dataset, target_dataset)
         with open(os.path.join(source_dataset, 'interduplicates.json'), 'w') as f:
             json.dump(nodes, f)
-        # with open(os.path.join(source_dataset, 'representatives.json'), 'w') as f:
-        # json.dump([d['id_within_dataset'] for n, d in G.nodes(data=True)
-        # if d['dataset'] == source_dataset], f)
+        with open(os.path.join(source_dataset, 'representatives.json'), 'w') as f:
+            json.dump([d['id_within_dataset'] for n, d in G.nodes(data=True)
+                       if d['dataset'] == source_dataset], f)
 
 
 if __name__ == '__main__':
