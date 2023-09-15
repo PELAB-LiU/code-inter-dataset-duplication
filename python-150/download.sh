@@ -1,10 +1,7 @@
 
-wget https://raw.githubusercontent.com/EdinburghNLP/code-docstring-corpus/master/parallel-corpus/data_ps.declbodies.test
-wget https://raw.githubusercontent.com/EdinburghNLP/code-docstring-corpus/master/parallel-corpus/data_ps.declbodies.train.gz
-wget https://raw.githubusercontent.com/EdinburghNLP/code-docstring-corpus/master/parallel-corpus/data_ps.declbodies.valid
-
-gunzip data_ps.declbodies.train.gz
-
-wget https://raw.githubusercontent.com/EdinburghNLP/code-docstring-corpus/master/parallel-corpus/data_ps.descriptions.test
-wget https://raw.githubusercontent.com/EdinburghNLP/code-docstring-corpus/master/parallel-corpus/data_ps.descriptions.train
-wget https://raw.githubusercontent.com/EdinburghNLP/code-docstring-corpus/master/parallel-corpus/data_ps.descriptions.valid
+data_urls="https://drive.google.com/uc?id=1hhTM7Inx-90j-TwcgPZByWcFl7CoPXj2"
+gdown 1hhTM7Inx-90j-TwcgPZByWcFl7CoPXj2 -O python_wan.tar.gz
+gunzip python_wan.tar.gz
+tar -xvf python_wan.tar
+rm -rf python_wan.tar
+rm -rf raw
