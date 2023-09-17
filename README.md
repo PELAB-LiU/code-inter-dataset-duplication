@@ -76,3 +76,20 @@ python sentence_bleu_dc.py --data_folder codebertrand_code2text_python-150/best_
 python sentence_bleu_dc.py --data_folder randrand_code2text_python-150/best_checkpoint/ --task code2text
 ```
 
+### Code search
+
+```shell
+cd codesearch
+```
+
+TLC dataset
+
+```shell
+./train_tlc.sh 
+```
+
+Python-150 dataset
+
+```shell
+./train_python-150.sh 
+```

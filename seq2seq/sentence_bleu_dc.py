@@ -84,6 +84,8 @@ def main(args):
         f'Length ref DUP: {np.mean([len(r) for r in references_dup]):.2f} +- {np.std([len(r) for r in references_dup]):.2f}')
     print(
         f'Length ref NO DUP: {np.mean([len(r) for r in references_no_dup]):.2f} +- {np.std([len(r) for r in references_no_dup]):.2f}')
+    pval = ttest_ind([len(r) for r in references_no_dup], [len(r) for r in references_no_dup]).pvalue
+    print(f'p-value ref length: {pval:.4f}')
 
     pval = ttest_ind(bleu_no_dup, bleu_dup).pvalue
     print(f'p-value: {pval:.4f}')
