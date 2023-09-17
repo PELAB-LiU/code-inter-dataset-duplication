@@ -30,7 +30,7 @@ def normalize_code(tokens, lang):
     return [t.lower() for t in new_tokens if t != '']
 
 
-def compute_statistics(dataset, lang, inter, task, rep):
+def compute_statistics(dataset, lang, inter, task, rep, split):
     # load dup_ids
     with open(inter, 'r') as json_file:
         dup_ids = json.load(json_file)
@@ -62,9 +62,10 @@ def compute_statistics(dataset, lang, inter, task, rep):
           f'+- {np.std([len(p["tokens_filtered"]) for p in new_dataset]):.2f}')
 
     print('Statistics per group')
-    split = 'test'
-    g_dup = [p for p in new_dataset if p['is_duplicated'] and p['split_within_dataset'] == split]
-    g_nondup = [p for p in new_dataset if not p['is_duplicated'] and p['split_within_dataset'] == split]
+    g_dup = [p for p in new_dataset if p['is_duplicated'] and (p['split_within_dataset'] == split
+                                                               if split != 'all' else True)]
+    g_nondup = [p for p in new_dataset if not p['is_duplicated'] and (p['split_within_dataset'] == split
+                                                                      if split != 'all' else True)]
     print(f'Samples duplicated: {len(g_dup)}')
     print(f'Samples non-duplicated: {len(g_nondup)}')
 
@@ -96,7 +97,7 @@ def compute_statistics(dataset, lang, inter, task, rep):
 
 def main(args):
     dataset = load_dataset(args.data)
-    compute_statistics(dataset, args.lang, args.inter, args.task, args.rep)
+    compute_statistics(dataset, args.lang, args.inter, args.task, args.rep, args.split)
 
 
 if __name__ == '__main__':
@@ -105,6 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('--lang', type=str, required=True)
     parser.add_argument('--inter', type=str, required=True)
     parser.add_argument('--rep', type=str, required=True)
-    parser.add_argument('--task', type=str, required=True, choices=['code2text', 'codetrans'])
+    parser.add_argument('--task', type=str, required=True, choices=['code2text', 'codetrans', 'clone'])
+    parser.add_argument('--split', default='all', type=str, choices=['test', 'valid', 'train', 'all'])
     args = parser.parse_args()
     main(args)

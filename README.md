@@ -37,6 +37,20 @@ json file for each dataset containing the snippets that are in codesearchnet and
 python dataset_overlapping.py --lang java|python
 ```
 
+## Upload to HF
+
+This works for all dataset less than BigCloneBench. For BigCloneBench, see the next section.
+```shell
+python upload_hf_dataset.py --data dataset_name/data.jsonl --inter dataset_name/interduplicates.json --rep dataset_name/representatives.json --hf_dataset hf_dir
+```
+
+### BigCloneBench case
+
+```shell
+cd bigcodebench
+python compute_problematic_pairs_upload_hf.py
+```
+
 ## Running fine-tuning procedures
 
 ### Seq2seq tasks

@@ -204,3 +204,6 @@ representatives.json
 /clone_detection/codebert_clonedetection/
 /clone_detection/
 /clone_detection/rand_clonedetection/
+/bigclonebench/test.jsonl
+/bigclonebench/train.jsonl
+/bigclonebench/valid.jsonl
