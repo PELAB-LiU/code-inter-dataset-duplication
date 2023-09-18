@@ -18,7 +18,7 @@ def tokenize_function(examples, prefix, tokenizer_source, tokenizer_target, sour
     if is_split_source:
         inputs = [prefix + ' '.join(example) for example in examples[source_column]]
     else:
-        inputs = [example for example in examples[source_column]]
+        inputs = [prefix + example for example in examples[source_column]]
     if is_split_target:
         targets = [' '.join(example) for example in examples[target_column]]
     else:

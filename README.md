@@ -1,3 +1,7 @@
+
+
+
+
 # code-inter-dataset-duplication
 
 Creation of empty database.
@@ -49,6 +53,8 @@ python compute_problematic_pairs_upload_hf.py
 
 ## Running fine-tuning procedures
 
+### Seq2seq tasks
+
 ```shell
 cd seq2seq
 ```
@@ -57,13 +63,47 @@ Code translation:
 ```shell
 ./train_codetrans.sh
 ./evaluate_codetrans.sh
+./train_codetrans_rand.sh
+./evaluate_codetrans_rand.sh
+python sentence_bleu_dc.py --data_folder codebertrand_java2csharp/best_checkpoint/ --task codetrans
+python sentence_bleu_dc.py --data_folder randrand_java2csharp/best_checkpoint/ --task codetrans
 ```
 
-Code documentation:
+Code documentation (tlc):
+```shell
+./train_code2seq-tlc.sh
+./evaluate_code2seq-tlc.sh
+./train_code2seq-tlc_rand.sh
+./evaluate_code2seq-tlc_rand.sh
+python sentence_bleu_dc.py --data_folder codebertrand_code2text_tlc/best_checkpoint/ --task code2text
+python sentence_bleu_dc.py --data_folder randrand_code2text_tlc/best_checkpoint/ --task code2text
+```
 
+Code documentation (python-150):
 
-## TODOs
+```shell
+./train_code2seq-python-150.sh
+./evaluate_code2seq-python-150.sh
+./train_code2seq-python-150_rand.sh
+./evaluate_code2seq-python-150_rand.sh
+python sentence_bleu_dc.py --data_folder codebertrand_code2text_python-150/best_checkpoint/ --task code2text
+python sentence_bleu_dc.py --data_folder randrand_code2text_python-150/best_checkpoint/ --task code2text
+```
 
-- Scripts training
-- Scripts upload to hf
+### Code search
 
+```shell
+cd codesearch
+```
+
+TLC dataset
+
+```shell
+./train_tlc.sh 
+```
+
+Python-150 dataset
+
+```shell
+./train_python-150.sh 
+```

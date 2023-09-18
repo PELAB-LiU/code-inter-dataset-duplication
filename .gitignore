@@ -195,7 +195,15 @@ representatives.json
 /seq2seq/codebertrand_code2text_python-150/
 /seq2seq/robertarand_code2text_tlc/
 /seq2seq/robertarand_java2csharp/
+/seq2seq/randrand_code2text_tlc/
+/seq2seq/randrand_java2csharp/
+/seq2seq/codet5_code2text_python-150/
+/seq2seq/codet5_code2text_tlc/
+/seq2seq/randrand_code2text_python-150/
 /python-150/attributes/
+/clone_detection/codebert_clonedetection/
+/clone_detection/
+/clone_detection/rand_clonedetection/
 /bigclonebench/test.jsonl
 /bigclonebench/train.jsonl
 /bigclonebench/valid.jsonl

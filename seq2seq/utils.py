@@ -46,6 +46,27 @@ def load_model_tokenizers_seq2seq(args: ModelArguments):
         tokenizer_target = tokenizer_source
         model.config.decoder_start_token_id = tokenizer_target.cls_token_id
         model.config.pad_token_id = tokenizer_target.pad_token_id
+    elif args.architecture == 'rand+rand':
+        tokenizer_source = AutoTokenizer.from_pretrained(args.encoder)
+        tokenizer_target = tokenizer_source
+        with tempfile.TemporaryDirectory() as tmp_dirname, tempfile.TemporaryDirectory() as tmp_dirname_2:
+            # decoder
+            config = AutoConfig.from_pretrained(args.encoder)
+            config.num_hidden_layers = args.decoder_rand_layers
+            config.is_decoder = True
+            rand_decoder = RobertaModel(config)
+            rand_decoder.save_pretrained(tmp_dirname)
+
+            # encoder
+            config = AutoConfig.from_pretrained(args.encoder)
+            rand_encoder = RobertaModel(config)
+            config.num_hidden_layers = 6
+            rand_encoder.save_pretrained(tmp_dirname_2)
+
+            model = EncoderDecoderModel.from_encoder_decoder_pretrained(tmp_dirname_2, tmp_dirname)
+            model.decoder.embeddings = model.encoder.embeddings
+        model.config.decoder_start_token_id = tokenizer_target.cls_token_id
+        model.config.pad_token_id = tokenizer_target.pad_token_id
     else:
         raise NotImplementedError()
     print(f"Learneable params: {sum(p.numel() for p in set(model.parameters()))}")
