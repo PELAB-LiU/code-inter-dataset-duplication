@@ -20,11 +20,16 @@ for split in SPLITS:
         for description, code in zip(file1, file2):
             description = json.loads(description)
             code = json.loads(code).replace("\t", " ")
-            all_data.append({"id_within_dataset": i,
-                             "snippet": code,
-                             "tokens": get_tokens_from_snippet(code, 'python'),
-                             "nl": ' '.join(description),
-                             "split_within_dataset": split})
+            try:
+                all_data.append({"id_within_dataset": i,
+                                 "snippet": code,
+                                 "tokens": get_tokens_from_snippet(code, 'python'),
+                                 "nl": ' '.join(description),
+                                 "split_within_dataset": split})
+            except:
+                print(f'Error with {i}')
+                log.register_fail_snippet()
+                continue
             i += 1
             log.register_success_snippet()
 
