@@ -12,6 +12,8 @@ class ModelArguments:
     encoder: Optional[str] = field(default="microsoft/codebert-base")
     decoder: Optional[str] = field(default="microsoft/codebert-base")
     decoder_rand_layers: int = field(default=6)
+    telly: bool = field(default=False)
+    peft: bool = field(default=False)
 
 
 @dataclass
@@ -67,3 +69,5 @@ class EvaluationArguments:
     max_length_target: int = field(default=128)
     num_beams: int = field(default=10)
     include_idx: bool = field(default=False)
+    peft: bool = field(default=False)
+    base_model: str = field(default=None)

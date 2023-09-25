@@ -1,6 +1,7 @@
 import os.path
 
 import torch
+from peft import PeftConfig, PeftModel
 from tqdm import tqdm
 from transformers import HfArgumentParser, AutoModelForSeq2SeqLM, AutoTokenizer, GenerationConfig
 
@@ -13,7 +14,12 @@ def main():
     parser = HfArgumentParser((DataArguments, EvaluationArguments))
     data_args, eval_args = parser.parse_args_into_dataclasses()
 
-    model = AutoModelForSeq2SeqLM.from_pretrained(eval_args.checkpoint).cuda()
+    if eval_args.peft:
+        model = AutoModelForSeq2SeqLM.from_pretrained(eval_args.base_model).cuda()
+        model = PeftModel.from_pretrained(model, eval_args.checkpoint)
+    else:
+        model = AutoModelForSeq2SeqLM.from_pretrained(eval_args.checkpoint).cuda()
+
     tokenizer_source = AutoTokenizer.from_pretrained(eval_args.tokenizer_source)
     tokenizer_target = AutoTokenizer.from_pretrained(eval_args.tokenizer_target)
 

@@ -7,7 +7,7 @@ import string
 import nltk
 import numpy as np
 from nltk.translate.bleu_score import SmoothingFunction
-from scipy.stats import ttest_ind
+from scipy.stats import ttest_ind, ranksums
 
 from bleu_code2text import normalize, splitPuncts
 
@@ -25,7 +25,7 @@ def nltk_sentence_bleu(hypothesis, reference):
 def get_normalization(task):
     if task == 'code2text':
         return lambda s: normalize(
-            splitPuncts(s.strip()))  # [j for j in normalize(splitPuncts(s.strip())) if j not in string.punctuation]
+            splitPuncts(s.lower().strip()))
     elif task == 'codetrans':
         return lambda s: s.strip().split()
 
@@ -75,10 +75,9 @@ def main(args):
     bleu_no_dup = [nltk_sentence_bleu(p, r) for p, r in zip(predictions_no_dup, references_no_dup)]
     bleu_rand = [nltk_sentence_bleu(p, r) for p, r in zip(predictions_ran, references_ran)]
 
-    print(f'BLEU FULL: {np.mean(bleu_full) * 100:.2f}')
-    print(f'BLEU NO DUP: {np.mean(bleu_no_dup) * 100:.2f}')
-    print(f'BLEU DUP: {np.mean(bleu_dup) * 100:.2f}')
-    # print(f'BLEU RAN: {np.mean(bleu_rand) * 100:.2f}')
+    print(f'BLEU FULL: {np.mean(bleu_full) * 100:.2f} +- {np.std(bleu_full) * 100:.2f}')
+    print(f'BLEU NO DUP: {np.mean(bleu_no_dup) * 100:.2f} +- {np.std(bleu_no_dup) * 100:.2f}')
+    print(f'BLEU DUP: {np.mean(bleu_dup) * 100:.2f} +- {np.std(bleu_dup) * 100:.2f}')
 
     print(
         f'Length ref DUP: {np.mean([len(r) for r in references_dup]):.2f} +- {np.std([len(r) for r in references_dup]):.2f}')
@@ -87,8 +86,10 @@ def main(args):
     pval = ttest_ind([len(r) for r in references_no_dup], [len(r) for r in references_no_dup]).pvalue
     print(f'p-value ref length: {pval:.4f}')
 
-    pval = ttest_ind(bleu_no_dup, bleu_dup).pvalue
+    pval = ttest_ind(bleu_no_dup, bleu_dup, equal_var=False).pvalue
+    pvalw = ranksums(bleu_no_dup, bleu_dup).pvalue
     print(f'p-value: {pval:.4f}')
+    # print(f'p-valuew: {pvalw:.4f}')
     print(f'Cohen d: {cohend(bleu_dup, bleu_no_dup):.4f}')
 
 

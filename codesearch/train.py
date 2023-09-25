@@ -6,6 +6,7 @@ from collections import defaultdict
 import numpy as np
 import torch
 from datasets import load_dataset
+from peft import TaskType, LoraConfig, get_peft_model
 from scipy.stats import ttest_ind
 from torch import nn
 from torch.utils.data import DataLoader
@@ -80,7 +81,10 @@ def train(train_set, model, checkpoint, batch_size_train=32, lr=5e-5, epochs=1, 
     logger.info(f'Effective batch size: {batch_size_train * gradient_accumulation}')
     logger.info(f'Initial lr: {lr}')
     logger.info(f'Epochs: {epochs}')
-    logger.info(f'Parameters: {sum(map(torch.numel, filter(lambda p: p.requires_grad, model.parameters())))}')
+    logger.info(f'Parameters: {sum(map(torch.numel, filter(lambda p: p.requires_grad, model.parameters())))} ')
+    req_params = sum(map(torch.numel, filter(lambda p: p.requires_grad, model.parameters())))
+    all_params = sum(map(torch.numel, model.parameters()))
+    logger.info(f'Trainable %: {req_params * 100 / all_params:.2f}')
 
     num_training_steps = epochs * len(train_dataloader)
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_training_steps * 0.1,
@@ -160,6 +164,12 @@ def main():
     parser = HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
+    file = logging.FileHandler(model_args.checkpoint + '.log')
+    file.setLevel(level=logging.INFO)
+    formatter = logging.Formatter('[%(asctime)s | %(filename)s | line %(lineno)d] - %(levelname)s: %(message)s')
+    file.setFormatter(formatter)
+    logger.addHandler(file)
+
     set_seed(training_args.seed)
     if not model_args.is_baseline:
         model = AutoModel.from_pretrained(model_args.model_name_or_path)
@@ -167,7 +177,19 @@ def main():
         config = AutoConfig.from_pretrained(model_args.model_name_or_path)
         config.num_hidden_layers = 6
         model = RobertaModel(config)
+
+    if model_args.peft:
+        peft_config = LoraConfig(r=8, lora_alpha=32, lora_dropout=0.1, task_type=TaskType.FEATURE_EXTRACTION)
+        model = get_peft_model(model, peft_config)
     dual_encoder_model = DualEncoderModel(model, model)
+    if model_args.telly > 0:
+        for n, p in dual_encoder_model.named_parameters():
+            if 'embeddings' in n:
+                p.requires_grad = False
+            for j in range(0, model_args.telly):
+                if f'encoder.layer.{j}.' in n:
+                    p.requires_grad = False
+
     tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)
 
     dataset = load_dataset(data_args.data_path_hf)
@@ -202,8 +224,9 @@ def main():
               attention_mask_code='attention_mask_tokens',
               attention_mask_nl='attention_mask_nl')
 
-    dual_encoder_model.load_state_dict(torch.load(model_args.checkpoint))
-    dual_encoder_model.to(DEVICE)
+    if not training_args.do_train:
+        dual_encoder_model.load_state_dict(torch.load(model_args.checkpoint))
+        dual_encoder_model.to(DEVICE)
 
     rrs = evaluate(eval_dataset=full_test_dataset,
                    model=dual_encoder_model,

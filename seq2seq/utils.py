@@ -1,9 +1,22 @@
 import tempfile
 
 from datasets import load_dataset
+from peft import TaskType, get_peft_model, LoraConfig
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, EncoderDecoderModel, AutoConfig, RobertaModel
 
 from args import ModelArguments, DataArguments
+
+
+def print_trainable_parameters(model):
+    trainable_params = 0
+    all_param = 0
+    for param in model.parameters():
+        all_param += param.numel()
+        if param.requires_grad:
+            trainable_params += param.numel()
+    print(
+        f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
+    )
 
 
 def load_splits(args: DataArguments):
@@ -69,7 +82,13 @@ def load_model_tokenizers_seq2seq(args: ModelArguments):
         model.config.pad_token_id = tokenizer_target.pad_token_id
     else:
         raise NotImplementedError()
-    print(f"Learneable params: {sum(p.numel() for p in set(model.parameters()))}")
+    if args.telly:
+        for p in model.encoder.parameters():
+            p.requires_grad = False
+    if args.peft:
+        peft_config = LoraConfig(r=8, lora_alpha=32, lora_dropout=0.1, task_type=TaskType.SEQ_2_SEQ_LM)
+        model = get_peft_model(model, peft_config)
+    print_trainable_parameters(model)
     return model, tokenizer_source, tokenizer_target
 
 

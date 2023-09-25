@@ -7,6 +7,8 @@ class ModelArguments:
     model_name_or_path: Optional[str] = field(default="microsoft/codebert-base")
     checkpoint: str = field(default=None)
     is_baseline: bool = field(default=False)
+    telly: int = field(default=0)
+    peft: bool = field(default=False)
 
 
 @dataclass

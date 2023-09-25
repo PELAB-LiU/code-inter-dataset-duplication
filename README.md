@@ -1,7 +1,3 @@
-
-
-
-
 # code-inter-dataset-duplication
 
 Creation of empty database.
@@ -39,16 +35,8 @@ python dataset_overlapping.py --lang java|python
 
 ## Upload to HF
 
-This works for all dataset less than BigCloneBench. For BigCloneBench, see the next section.
 ```shell
 python upload_hf_dataset.py --data dataset_name/data.jsonl --inter dataset_name/interduplicates.json --rep dataset_name/representatives.json --hf_dataset hf_dir
-```
-
-### BigCloneBench case
-
-```shell
-cd bigcodebench
-python compute_problematic_pairs_upload_hf.py
 ```
 
 ## Running fine-tuning procedures
@@ -61,49 +49,24 @@ cd seq2seq
 
 Code translation:
 ```shell
-./train_codetrans.sh
-./evaluate_codetrans.sh
-./train_codetrans_rand.sh
-./evaluate_codetrans_rand.sh
-python sentence_bleu_dc.py --data_folder codebertrand_java2csharp/best_checkpoint/ --task codetrans
-python sentence_bleu_dc.py --data_folder randrand_java2csharp/best_checkpoint/ --task codetrans
+./train_models_codetrans.sh
+python sentence_bleu_dc.py --data_folder t5_java2csharp/best_checkpoint/ --task codetrans
+python sentence_bleu_dc.py --data_folder codet5_java2csharp/best_checkpoint/ --task codetrans
+python sentence_bleu_dc.py --data_folder codet5_java2csharp_peft/best_checkpoint/ --task codetrans
 ```
 
-Code documentation (tlc):
-```shell
-./train_code2seq-tlc.sh
-./evaluate_code2seq-tlc.sh
-./train_code2seq-tlc_rand.sh
-./evaluate_code2seq-tlc_rand.sh
-python sentence_bleu_dc.py --data_folder codebertrand_code2text_tlc/best_checkpoint/ --task code2text
-python sentence_bleu_dc.py --data_folder randrand_code2text_tlc/best_checkpoint/ --task code2text
-```
-
-Code documentation (python-150):
+Code summarization (python-150):
 
 ```shell
-./train_code2seq-python-150.sh
-./evaluate_code2seq-python-150.sh
-./train_code2seq-python-150_rand.sh
-./evaluate_code2seq-python-150_rand.sh
-python sentence_bleu_dc.py --data_folder codebertrand_code2text_python-150/best_checkpoint/ --task code2text
-python sentence_bleu_dc.py --data_folder randrand_code2text_python-150/best_checkpoint/ --task code2text
+./train_models_code2seq-python-150.sh
+python sentence_bleu_dc.py --data_folder t5_code2text_python-150/best_checkpoint/ --task code2text
+python sentence_bleu_dc.py --data_folder codet5_code2text_python-150/best_checkpoint/ --task code2text
+python sentence_bleu_dc.py --data_folder t5_code2text_python-150_peft/best_checkpoint/ --task code2text
 ```
 
 ### Code search
 
 ```shell
 cd codesearch
-```
-
-TLC dataset
-
-```shell
-./train_tlc.sh 
-```
-
-Python-150 dataset
-
-```shell
-./train_python-150.sh 
+./train_models_python-150.sh 
 ```
