@@ -14,7 +14,7 @@ def main():
     parser = HfArgumentParser((DataArguments, EvaluationArguments))
     data_args, eval_args = parser.parse_args_into_dataclasses()
 
-    if eval_args.peft:
+    if eval_args.peft or eval_args.prefix_tuning:
         model = AutoModelForSeq2SeqLM.from_pretrained(eval_args.base_model).cuda()
         model = PeftModel.from_pretrained(model, eval_args.checkpoint)
     else:

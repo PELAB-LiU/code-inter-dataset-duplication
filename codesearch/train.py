@@ -1,12 +1,13 @@
 import logging
 import os
+import pickle
 import random
 from collections import defaultdict
 
 import numpy as np
 import torch
 from datasets import load_dataset
-from peft import TaskType, LoraConfig, get_peft_model
+from peft import TaskType, LoraConfig, get_peft_model, PrefixTuningConfig
 from scipy.stats import ttest_ind
 from torch import nn
 from torch.utils.data import DataLoader
@@ -181,6 +182,10 @@ def main():
     if model_args.peft:
         peft_config = LoraConfig(r=8, lora_alpha=32, lora_dropout=0.1, task_type=TaskType.FEATURE_EXTRACTION)
         model = get_peft_model(model, peft_config)
+    elif model_args.prefix_tuning:
+        peft_config = PrefixTuningConfig(task_type=TaskType.FEATURE_EXTRACTION, inference_mode=False,
+                                         num_virtual_tokens=20, prefix_projection=True)
+        model = get_peft_model(model, peft_config)
     dual_encoder_model = DualEncoderModel(model, model)
     if model_args.telly > 0:
         for n, p in dual_encoder_model.named_parameters():
@@ -240,6 +245,9 @@ def main():
     logger.info(f'Full mrr: {np.mean(rrs[0] + rrs[1]):.4f}')
     logger.info(f'T-test: {ttest_ind(rrs[0], rrs[1]).pvalue:.4f}')
     logger.info(f'Cohen d: {cohend(rrs[0], rrs[1]):.4f}')
+
+    with open(f'{model_args.checkpoint}.pkl', 'wb') as handle:
+        pickle.dump(rrs, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == '__main__':

@@ -9,6 +9,7 @@ class ModelArguments:
     is_baseline: bool = field(default=False)
     telly: int = field(default=0)
     peft: bool = field(default=False)
+    prefix_tuning: bool = field(default=False)
 
 
 @dataclass

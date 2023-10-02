@@ -1,7 +1,7 @@
 import tempfile
 
 from datasets import load_dataset
-from peft import TaskType, get_peft_model, LoraConfig
+from peft import TaskType, get_peft_model, LoraConfig, PrefixTuningConfig
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, EncoderDecoderModel, AutoConfig, RobertaModel
 
 from args import ModelArguments, DataArguments
@@ -86,7 +86,11 @@ def load_model_tokenizers_seq2seq(args: ModelArguments):
         for p in model.encoder.parameters():
             p.requires_grad = False
     if args.peft:
-        peft_config = LoraConfig(r=8, lora_alpha=32, lora_dropout=0.1, task_type=TaskType.SEQ_2_SEQ_LM)
+        peft_config = LoraConfig(r=args.r, lora_alpha=32, lora_dropout=0.1, task_type=TaskType.SEQ_2_SEQ_LM)  # r=8
+        model = get_peft_model(model, peft_config)
+    if args.prefix_tuning:
+        peft_config = PrefixTuningConfig(task_type=TaskType.SEQ_2_SEQ_LM, inference_mode=False,
+                                         num_virtual_tokens=20, prefix_projection=True)
         model = get_peft_model(model, peft_config)
     print_trainable_parameters(model)
     return model, tokenizer_source, tokenizer_target

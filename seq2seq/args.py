@@ -14,6 +14,8 @@ class ModelArguments:
     decoder_rand_layers: int = field(default=6)
     telly: bool = field(default=False)
     peft: bool = field(default=False)
+    prefix_tuning: bool = field(default=False)
+    r: int = field(default=8)
 
 
 @dataclass
@@ -71,3 +73,4 @@ class EvaluationArguments:
     include_idx: bool = field(default=False)
     peft: bool = field(default=False)
     base_model: str = field(default=None)
+    prefix_tuning: bool = field(default=False)

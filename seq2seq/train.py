@@ -32,6 +32,20 @@ def tokenize_function(examples, prefix, tokenizer_source, tokenizer_target, sour
     return model_inputs
 
 
+def f1_subtokens_python(pred, label):
+    pred = [p.lower() for p in pred.split('_') if p != '']
+    label = [l.lower() for l in label.split('_') if l != '']
+    if len(pred) == 0:
+        return 0.
+    prec = len([p for p in pred if p in label]) / len(pred)
+    recall = len([l for l in label if l in pred]) / len(label)
+    if prec + recall == 0:
+        return 0.
+    else:
+        return 2 * prec * recall / (prec + recall)
+
+
+
 def compute_metrics(eval_pred, tokenizer):
     predictions, labels = eval_pred
     predictions = np.where(predictions != -100, predictions, tokenizer.pad_token_id)
@@ -56,8 +70,10 @@ def compute_metrics(eval_pred, tokenizer):
                                                os.path.join(tmp_dirname, 'references_idx.txt'))
         bleu_score_code2text = bleuFromMaps(goldMap, predictionMap)[0]
 
+    f1s = [f1_subtokens_python(pred, label) for pred, label in zip(decoded_preds, decoded_labels)]
     return {'bleu-codetrans-cxg': round(bleu_score_code_trans, 4),
-            'bleu-code2text-cxg': round(bleu_score_code2text, 4)}
+            'bleu-code2text-cxg': round(bleu_score_code2text, 4),
+            'f1_subtoken': np.mean(f1s)}
 
 
 def main():
