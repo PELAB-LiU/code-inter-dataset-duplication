@@ -67,10 +67,13 @@ def set_seed(seed: int):
 
 
 # TODO set input to train
-def train(train_set, model, checkpoint, batch_size_train=32, lr=5e-5, epochs=1, gradient_accumulation=1,
+def train(train_set, eval_dataset,
+          model, checkpoint, batch_size_train=32, lr=5e-5, epochs=1, gradient_accumulation=1,
           max_grad_norm=1,
           log_steps=100, input_ids_code='input_ids_tokens', inputs_ids_nl='input_ids_nl',
-          attention_mask_code='attention_mask_tokens', attention_mask_nl='attention_mask_nl'):
+          attention_mask_code='attention_mask_tokens', attention_mask_nl='attention_mask_nl',
+          batch_size_eval=1000,
+          patience=2):
     train_set.set_format("torch")
     train_dataloader = DataLoader(train_set, shuffle=True, batch_size=batch_size_train)
     model.to(DEVICE)
@@ -92,6 +95,8 @@ def train(train_set, model, checkpoint, batch_size_train=32, lr=5e-5, epochs=1, 
                                                 num_training_steps=num_training_steps)
     progress_bar = tqdm(range(num_training_steps))
     steps = 0
+    best_mrr = 0
+    e_count = 0
     for epoch in range(1, epochs + 1):
         train_loss = 0.0
         model.train()
@@ -120,13 +125,27 @@ def train(train_set, model, checkpoint, batch_size_train=32, lr=5e-5, epochs=1, 
                 logger.info(
                     f'Epoch {epoch} | step={steps} | train_loss={train_loss / (j + 1):.4f}'
                 )
-
+        rrs = evaluate(eval_dataset=eval_dataset,
+                       model=model,
+                       batch_size_eval=batch_size_eval,
+                       input_ids_code='input_ids_tokens',
+                       inputs_ids_nl='input_ids_nl',
+                       attention_mask_code='attention_mask_tokens',
+                       attention_mask_nl='attention_mask_nl')
+        full_mrr = np.mean(rrs[0] + rrs[1])
+        if full_mrr > best_mrr:
+            best_mrr = full_mrr
+            e_count = 0
+            logger.info('Saving model!')
+            torch.save(model.state_dict(), checkpoint)
+            logger.info(f'Model saved: {checkpoint}')
+        else:
+            e_count += 1
+        if e_count == patience:
+            break
         logger.info(
-            f'Epoch {epoch} | train_loss={train_loss / len(train_dataloader):.4f}'
+            f'Epoch {epoch} | train_loss={train_loss / len(train_dataloader):.4f} | mrr={full_mrr:.4f}'
         )
-    logger.info('Saving model!')
-    torch.save(model.state_dict(), checkpoint)
-    logger.info(f'Model saved: {checkpoint}')
 
 
 def evaluate(eval_dataset, model, batch_size_eval=5000, input_ids_code='input_ids_tokens', inputs_ids_nl='input_ids_nl',
@@ -216,6 +235,7 @@ def main():
 
     if training_args.do_train:
         train(train_set=dataset["train"],
+              eval_dataset=dataset["valid"],
               model=dual_encoder_model,
               checkpoint=model_args.checkpoint,
               batch_size_train=training_args.per_device_train_batch_size,
@@ -227,7 +247,9 @@ def main():
               input_ids_code='input_ids_tokens',
               inputs_ids_nl='input_ids_nl',
               attention_mask_code='attention_mask_tokens',
-              attention_mask_nl='attention_mask_nl')
+              attention_mask_nl='attention_mask_nl',
+              batch_size_eval=training_args.batch_size_eval,
+              patience=training_args.patience)
 
     if not training_args.do_train:
         dual_encoder_model.load_state_dict(torch.load(model_args.checkpoint))

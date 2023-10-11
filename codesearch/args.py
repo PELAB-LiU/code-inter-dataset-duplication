@@ -35,3 +35,4 @@ class TrainingArguments:
     learning_rate: float = field(default=5e-5)
     seed: int = field(default=123)
     max_grad_norm: float = field(default=1.)
+    patience: int = field(default=2)
