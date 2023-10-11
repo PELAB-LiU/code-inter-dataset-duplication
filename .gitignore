@@ -259,3 +259,17 @@ representatives.json
 /codesearch/bert_python-150.bin
 /codesearch/bert_python-150.bin.log
 /codesearch/bert_python-150.bin.pkl
+/codesearch/codebert_python-150_telly12.bin.pkl
+/codesearch/codebert_python-150_telly11.bin.pkl
+/codesearch/codebert_python-150_telly10.bin.pkl
+/codesearch/codebert_python-150_telly9.bin.pkl
+/codesearch/codebert_python-150_telly8.bin.pkl
+/codesearch/codebert_python-150_telly7.bin.pkl
+/codesearch/codebert_python-150_telly6.bin.pkl
+/codesearch/codebert_python-150_telly5.bin.pkl
+/codesearch/codebert_python-150_telly4.bin.pkl
+/codesearch/codebert_python-150_telly3.bin.pkl
+/codesearch/codebert_python-150_telly1.bin.pkl
+/codesearch/codebert_python-150_telly2.bin.pkl
+/seq2seq/codet5_code2text_python-150_peft_qvok/
+/seq2seq/codet5_code2text_python-150_peft_qvok_r512/
