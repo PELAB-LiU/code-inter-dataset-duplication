@@ -95,17 +95,31 @@ def main():
                                                              target_column=data_args.target_column),
                           batched=True, load_from_cache_file=False, num_proc=8).remove_columns([data_args.source_column,
                                                                                                 data_args.target_column])
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=training_args.patience)]
 
+    # prefix tuning has a bug when load_best_model_at_end is true and projection is true.
+    # this is why I do this
+    # at some point I should report the bug in HF
+    # it is not critical as the best model is normally the last one
+    if model_args.prefix_tuning:
+        training_args.load_best_model_at_end = False
+        callbacks = []
     trainer = Seq2SeqTrainer(
         model=model,
         args=training_args,
         train_dataset=dataset["train"],
         eval_dataset=dataset["valid"],
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=training_args.patience)],
+        callbacks=callbacks,
         compute_metrics=lambda x: compute_metrics(x, tokenizer_target)
     )
     trainer.train()
-    trainer.save_model(os.path.join(training_args.output_dir, 'best_checkpoint'))
+
+    if model_args.prefix_tuning:
+        old_name = os.path.join(training_args.output_dir, os.listdir(training_args.output_dir)[0])
+        new_name = os.path.join(training_args.output_dir, 'best_checkpoint')
+        os.rename(old_name, new_name)
+    else:
+        trainer.save_model(os.path.join(training_args.output_dir, 'best_checkpoint'))
 
 
 if __name__ == '__main__':
