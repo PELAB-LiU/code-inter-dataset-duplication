@@ -85,8 +85,9 @@ def load_model_tokenizers_seq2seq(args: ModelArguments):
     if args.telly:
         for p in model.encoder.parameters():
             p.requires_grad = False
-    if args.peft:
-        peft_config = LoraConfig(r=args.r, lora_alpha=32, lora_dropout=0.1, task_type=TaskType.SEQ_2_SEQ_LM,
+    if args.lora:
+        peft_config = LoraConfig(r=args.r, lora_alpha=args.alpha,
+                                 lora_dropout=0.1, task_type=TaskType.SEQ_2_SEQ_LM,
                                  target_modules=['.q', '.v', '.o', '.k'])  # r=8, check lora alpha
         model = get_peft_model(model, peft_config)
     if args.prefix_tuning:

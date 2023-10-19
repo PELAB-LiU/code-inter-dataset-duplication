@@ -164,3 +164,98 @@ python generate_predictions.py \
   --target_column "cs" \
   --max_length_source 512 \
   --max_length_target 512
+
+# rand
+
+python train.py \
+  --architecture "encoder-decoder" \
+  --encoder_decoder "control_models/model_0" \
+  --data_path_hf "antolin/codetrans_interduplication" \
+  --source_column "snippet" \
+  --target_column "cs" \
+  --output_dir "rand0_java2csharp" \
+  --max_length_source 512 \
+  --max_length_target 512 \
+  --num_train_epochs 150 \
+  --patience 3 \
+  --generation_max_length 512 \
+  --metric_for_best_model "bleu-codetrans-cxg" \
+  --save_strategy "steps" \
+  --evaluation_strategy "steps" \
+  --eval_steps 5000 \
+  --max_steps 100000 \
+  --per_device_train_batch_size 16 \
+  --save_steps 5000
+
+python generate_predictions.py \
+  --checkpoint "rand0_java2csharp/best_checkpoint" \
+  --tokenizer_source "control_models/model_0" \
+  --tokenizer_target "control_models/model_0" \
+  --data_path_hf "antolin/codetrans_interduplication" \
+  --source_column "snippet" \
+  --target_column "cs" \
+  --max_length_source 512 \
+  --max_length_target 512
+
+
+
+python train.py \
+  --architecture "rand+rand" \
+  --encoder "microsoft/codebert-base" \
+  --data_path_hf "antolin/codetrans_interduplication" \
+  --source_column "snippet" \
+  --target_column "cs" \
+  --output_dir "rand_java2csharp" \
+  --max_length_source 512 \
+  --max_length_target 512 \
+  --num_train_epochs 150 \
+  --patience 3 \
+  --generation_max_length 512 \
+  --metric_for_best_model "bleu-codetrans-cxg" \
+  --save_strategy "steps" \
+  --evaluation_strategy "steps" \
+  --eval_steps 5000 \
+  --max_steps 100000 \
+  --per_device_train_batch_size 16 \
+  --save_steps 5000
+
+python generate_predictions.py \
+  --checkpoint "rand_java2csharp/best_checkpoint" \
+  --tokenizer_source "microsoft/codebert-base" \
+  --tokenizer_target "microsoft/codebert-base" \
+  --data_path_hf "antolin/codetrans_interduplication" \
+  --source_column "snippet" \
+  --target_column "cs" \
+  --max_length_source 512 \
+  --max_length_target 512
+
+
+python train.py \
+  --architecture "encoder+rand" \
+  --encoder "dbernsohn/roberta-python" \
+  --data_path_hf "antolin/codetrans_interduplication" \
+  --source_column "snippet" \
+  --target_column "cs" \
+  --output_dir "robertapython_java2csharp" \
+  --max_length_source 512 \
+  --max_length_target 512 \
+  --num_train_epochs 150 \
+  --patience 3 \
+  --generation_max_length 512 \
+  --metric_for_best_model "bleu-codetrans-cxg" \
+  --save_strategy "steps" \
+  --evaluation_strategy "steps" \
+  --eval_steps 5000 \
+  --max_steps 100000 \
+  --per_device_train_batch_size 16 \
+  --save_steps 5000
+
+python generate_predictions.py \
+  --checkpoint "robertapython_java2csharp/best_checkpoint" \
+  --tokenizer_source "dbernsohn/roberta-python" \
+  --tokenizer_target "dbernsohn/roberta-python" \
+  --data_path_hf "antolin/codetrans_interduplication" \
+  --source_column "snippet" \
+  --target_column "cs" \
+  --max_length_source 512 \
+  --max_length_target 512

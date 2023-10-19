@@ -1,13 +1,11 @@
 import os
-import tempfile
 
 import numpy as np
 from transformers import HfArgumentParser, Seq2SeqTrainer, EarlyStoppingCallback
 
-from bleu_codetrans import _bleu
-from bleu_code2text import computeMaps, bleuFromMaps
 from args import ModelArguments, TrainingArguments, DataArguments
-from utils import load_splits, load_model_tokenizers_seq2seq, save_list
+from evaluation_metrics import get_normalization, f1_subtokens, nltk_sentence_bleu
+from utils import load_splits, load_model_tokenizers_seq2seq
 
 
 def tokenize_function(examples, prefix, tokenizer_source, tokenizer_target, source_column,
@@ -45,8 +43,7 @@ def f1_subtokens_python(pred, label):
         return 2 * prec * recall / (prec + recall)
 
 
-
-def compute_metrics(eval_pred, tokenizer):
+def compute_metrics(eval_pred, tokenizer, task="code2text"):
     predictions, labels = eval_pred
     predictions = np.where(predictions != -100, predictions, tokenizer.pad_token_id)
     decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
@@ -54,26 +51,18 @@ def compute_metrics(eval_pred, tokenizer):
     # Replace -100 in the labels as we can't decode them.
     labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-    decoded_preds = [pred.strip()
+    normalization = get_normalization(task)
+    decoded_preds = [normalization(pred)
                      for pred in decoded_preds]
-    decoded_labels = [label.strip()
+    decoded_labels = [normalization(label)
                       for label in decoded_labels]
-    with tempfile.TemporaryDirectory() as tmp_dirname:
-        save_list(decoded_preds, os.path.join(tmp_dirname, 'predictions.txt'))
-        save_list(decoded_labels, os.path.join(tmp_dirname, 'references.txt'))
-        bleu_score_code_trans = _bleu(os.path.join(tmp_dirname, 'references.txt'),
-                                      os.path.join(tmp_dirname, 'predictions.txt'))
-
-        preds_indices = [f"{i}\t{t}" for i, t in enumerate(decoded_preds)]
-        save_list(decoded_labels, os.path.join(tmp_dirname, 'references_idx.txt'), True)
-        (goldMap, predictionMap) = computeMaps(preds_indices,
-                                               os.path.join(tmp_dirname, 'references_idx.txt'))
-        bleu_score_code2text = bleuFromMaps(goldMap, predictionMap)[0]
-
-    f1s = [f1_subtokens_python(pred, label) for pred, label in zip(decoded_preds, decoded_labels)]
-    return {'bleu-codetrans-cxg': round(bleu_score_code_trans, 4),
-            'bleu-code2text-cxg': round(bleu_score_code2text, 4),
-            'f1_subtoken': np.mean(f1s)}
+    assert len(decoded_labels) == len(decoded_preds)
+    if task == "func":
+        f1s = [f1_subtokens(pred, label) for pred, label in zip(decoded_preds, decoded_labels)]
+        return {"func": np.round(np.mean(f1s), 4)}
+    else:
+        bleu_full = [nltk_sentence_bleu(p, r) for p, r in zip(decoded_preds, decoded_labels)]
+        return {task: np.round(np.mean(bleu_full), 4)}
 
 
 def main():
@@ -110,7 +99,7 @@ def main():
         train_dataset=dataset["train"],
         eval_dataset=dataset["valid"],
         callbacks=callbacks,
-        compute_metrics=lambda x: compute_metrics(x, tokenizer_target)
+        # compute_metrics=lambda x: compute_metrics(x, tokenizer_target, training_args.metric_for_best_model)
     )
     trainer.train()
 

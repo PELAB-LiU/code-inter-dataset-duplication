@@ -8,7 +8,7 @@ class ModelArguments:
     checkpoint: str = field(default=None)
     is_baseline: bool = field(default=False)
     telly: int = field(default=0)
-    peft: bool = field(default=False)
+    lora: bool = field(default=False)
     prefix_tuning: bool = field(default=False)
 
 

@@ -2,10 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+*.png
 # C extensions
 *.so
-
+*.pkl
 # Distribution / packaging
 .Python
 build/
@@ -221,7 +221,7 @@ representatives.json
 /seq2seq/codet5_func_python-150_peft/
 /seq2seq/t5_func_python-150/
 /codesearch/codebert_python-150.bin.pkl
-/codesearch/codebert_python-150_peft.bin.pkl
+/codesearch/codebert_python-150_lora.bin.pkl
 /codesearch/roberta_python-150.bin.pkl
 /codesearch/codebert_python-150_prefix.bin.pkl
 /codesearch/codebert_tlc.bin.pkl
@@ -273,3 +273,15 @@ representatives.json
 /codesearch/codebert_python-150_telly2.bin.pkl
 /seq2seq/codet5_code2text_python-150_peft_qvok/
 /seq2seq/codet5_code2text_python-150_peft_qvok_r512/
+/codesearch/control_models/
+/seq2seq/bart_code2text_python-150/
+/seq2seq/codet5_code2text_python-150/
+/seq2seq/codet5_code2text_python-150_lora/
+/seq2seq/codet5_code2text_python-150_prefix/
+/seq2seq/codet5_large_code2text_python-150_prefix/
+/seq2seq/codet5_small_code2text_python-150_prefix/
+/seq2seq/javabert_code2text_python-150/
+/seq2seq/rand_code2text_python-150/
+/seq2seq/robertajava_code2text_python-150/
+/seq2seq/robertajavascript_code2text_python-150/
+/seq2seq/t5_code2text_python-150/

@@ -198,8 +198,8 @@ def main():
         config.num_hidden_layers = 6
         model = RobertaModel(config)
 
-    if model_args.peft:
-        peft_config = LoraConfig(r=8, lora_alpha=32, lora_dropout=0.1, task_type=TaskType.FEATURE_EXTRACTION)
+    if model_args.lora:
+        peft_config = LoraConfig(r=8, lora_alpha=16, lora_dropout=0.1, task_type=TaskType.FEATURE_EXTRACTION)
         model = get_peft_model(model, peft_config)
     elif model_args.prefix_tuning:
         peft_config = PrefixTuningConfig(task_type=TaskType.FEATURE_EXTRACTION, inference_mode=False,
@@ -251,9 +251,9 @@ def main():
               batch_size_eval=training_args.batch_size_eval,
               patience=training_args.patience)
 
-    if not training_args.do_train:
-        dual_encoder_model.load_state_dict(torch.load(model_args.checkpoint))
-        dual_encoder_model.to(DEVICE)
+
+    dual_encoder_model.load_state_dict(torch.load(model_args.checkpoint))
+    dual_encoder_model.to(DEVICE)
 
     rrs = evaluate(eval_dataset=full_test_dataset,
                    model=dual_encoder_model,
