@@ -1,13 +1,11 @@
 import os
-import tempfile
 
 import numpy as np
 from transformers import HfArgumentParser, Seq2SeqTrainer, EarlyStoppingCallback
 
-from bleu_codetrans import _bleu
-from bleu_code2text import computeMaps, bleuFromMaps
 from args import ModelArguments, TrainingArguments, DataArguments
-from utils import load_splits, load_model_tokenizers_seq2seq, save_list
+from evaluation_metrics import get_normalization, f1_subtokens, nltk_sentence_bleu
+from utils import load_splits, load_model_tokenizers_seq2seq
 
 
 def tokenize_function(examples, prefix, tokenizer_source, tokenizer_target, source_column,
@@ -32,7 +30,20 @@ def tokenize_function(examples, prefix, tokenizer_source, tokenizer_target, sour
     return model_inputs
 
 
-def compute_metrics(eval_pred, tokenizer):
+def f1_subtokens_python(pred, label):
+    pred = [p.lower() for p in pred.split('_') if p != '']
+    label = [l.lower() for l in label.split('_') if l != '']
+    if len(pred) == 0:
+        return 0.
+    prec = len([p for p in pred if p in label]) / len(pred)
+    recall = len([l for l in label if l in pred]) / len(label)
+    if prec + recall == 0:
+        return 0.
+    else:
+        return 2 * prec * recall / (prec + recall)
+
+
+def compute_metrics(eval_pred, tokenizer, task="code2text"):
     predictions, labels = eval_pred
     predictions = np.where(predictions != -100, predictions, tokenizer.pad_token_id)
     decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
@@ -40,24 +51,18 @@ def compute_metrics(eval_pred, tokenizer):
     # Replace -100 in the labels as we can't decode them.
     labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-    decoded_preds = [pred.strip()
+    normalization = get_normalization(task)
+    decoded_preds = [normalization(pred)
                      for pred in decoded_preds]
-    decoded_labels = [label.strip()
+    decoded_labels = [normalization(label)
                       for label in decoded_labels]
-    with tempfile.TemporaryDirectory() as tmp_dirname:
-        save_list(decoded_preds, os.path.join(tmp_dirname, 'predictions.txt'))
-        save_list(decoded_labels, os.path.join(tmp_dirname, 'references.txt'))
-        bleu_score_code_trans = _bleu(os.path.join(tmp_dirname, 'references.txt'),
-                                      os.path.join(tmp_dirname, 'predictions.txt'))
-
-        preds_indices = [f"{i}\t{t}" for i, t in enumerate(decoded_preds)]
-        save_list(decoded_labels, os.path.join(tmp_dirname, 'references_idx.txt'), True)
-        (goldMap, predictionMap) = computeMaps(preds_indices,
-                                               os.path.join(tmp_dirname, 'references_idx.txt'))
-        bleu_score_code2text = bleuFromMaps(goldMap, predictionMap)[0]
-
-    return {'bleu-codetrans-cxg': round(bleu_score_code_trans, 4),
-            'bleu-code2text-cxg': round(bleu_score_code2text, 4)}
+    assert len(decoded_labels) == len(decoded_preds)
+    if task == "func":
+        f1s = [f1_subtokens(pred, label) for pred, label in zip(decoded_preds, decoded_labels)]
+        return {"func": np.round(np.mean(f1s), 4)}
+    else:
+        bleu_full = [nltk_sentence_bleu(p, r) for p, r in zip(decoded_preds, decoded_labels)]
+        return {task: np.round(np.mean(bleu_full), 4)}
 
 
 def main():
@@ -79,17 +84,31 @@ def main():
                                                              target_column=data_args.target_column),
                           batched=True, load_from_cache_file=False, num_proc=8).remove_columns([data_args.source_column,
                                                                                                 data_args.target_column])
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=training_args.patience)]
 
+    # prefix tuning has a bug when load_best_model_at_end is true and projection is true.
+    # this is why I do this
+    # at some point I should report the bug in HF
+    # it is not critical as the best model is normally the last one
+    if model_args.prefix_tuning:
+        training_args.load_best_model_at_end = False
+        callbacks = []
     trainer = Seq2SeqTrainer(
         model=model,
         args=training_args,
         train_dataset=dataset["train"],
         eval_dataset=dataset["valid"],
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=training_args.patience)],
-        compute_metrics=lambda x: compute_metrics(x, tokenizer_target)
+        callbacks=callbacks,
+        # compute_metrics=lambda x: compute_metrics(x, tokenizer_target, training_args.metric_for_best_model)
     )
     trainer.train()
-    trainer.save_model(os.path.join(training_args.output_dir, 'best_checkpoint'))
+
+    if model_args.prefix_tuning:
+        old_name = os.path.join(training_args.output_dir, os.listdir(training_args.output_dir)[0])
+        new_name = os.path.join(training_args.output_dir, 'best_checkpoint')
+        os.rename(old_name, new_name)
+    else:
+        trainer.save_model(os.path.join(training_args.output_dir, 'best_checkpoint'))
 
 
 if __name__ == '__main__':

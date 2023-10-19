@@ -1,11 +1,13 @@
 import logging
 import os
+import pickle
 import random
 from collections import defaultdict
 
 import numpy as np
 import torch
 from datasets import load_dataset
+from peft import TaskType, LoraConfig, get_peft_model, PrefixTuningConfig
 from scipy.stats import ttest_ind
 from torch import nn
 from torch.utils.data import DataLoader
@@ -65,10 +67,13 @@ def set_seed(seed: int):
 
 
 # TODO set input to train
-def train(train_set, model, checkpoint, batch_size_train=32, lr=5e-5, epochs=1, gradient_accumulation=1,
+def train(train_set, eval_dataset,
+          model, checkpoint, batch_size_train=32, lr=5e-5, epochs=1, gradient_accumulation=1,
           max_grad_norm=1,
           log_steps=100, input_ids_code='input_ids_tokens', inputs_ids_nl='input_ids_nl',
-          attention_mask_code='attention_mask_tokens', attention_mask_nl='attention_mask_nl'):
+          attention_mask_code='attention_mask_tokens', attention_mask_nl='attention_mask_nl',
+          batch_size_eval=1000,
+          patience=2):
     train_set.set_format("torch")
     train_dataloader = DataLoader(train_set, shuffle=True, batch_size=batch_size_train)
     model.to(DEVICE)
@@ -80,13 +85,18 @@ def train(train_set, model, checkpoint, batch_size_train=32, lr=5e-5, epochs=1, 
     logger.info(f'Effective batch size: {batch_size_train * gradient_accumulation}')
     logger.info(f'Initial lr: {lr}')
     logger.info(f'Epochs: {epochs}')
-    logger.info(f'Parameters: {sum(map(torch.numel, filter(lambda p: p.requires_grad, model.parameters())))}')
+    logger.info(f'Parameters: {sum(map(torch.numel, filter(lambda p: p.requires_grad, model.parameters())))} ')
+    req_params = sum(map(torch.numel, filter(lambda p: p.requires_grad, model.parameters())))
+    all_params = sum(map(torch.numel, model.parameters()))
+    logger.info(f'Trainable %: {req_params * 100 / all_params:.2f}')
 
     num_training_steps = epochs * len(train_dataloader)
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_training_steps * 0.1,
                                                 num_training_steps=num_training_steps)
     progress_bar = tqdm(range(num_training_steps))
     steps = 0
+    best_mrr = 0
+    e_count = 0
     for epoch in range(1, epochs + 1):
         train_loss = 0.0
         model.train()
@@ -115,13 +125,27 @@ def train(train_set, model, checkpoint, batch_size_train=32, lr=5e-5, epochs=1, 
                 logger.info(
                     f'Epoch {epoch} | step={steps} | train_loss={train_loss / (j + 1):.4f}'
                 )
-
+        rrs = evaluate(eval_dataset=eval_dataset,
+                       model=model,
+                       batch_size_eval=batch_size_eval,
+                       input_ids_code='input_ids_tokens',
+                       inputs_ids_nl='input_ids_nl',
+                       attention_mask_code='attention_mask_tokens',
+                       attention_mask_nl='attention_mask_nl')
+        full_mrr = np.mean(rrs[0] + rrs[1])
+        if full_mrr > best_mrr:
+            best_mrr = full_mrr
+            e_count = 0
+            logger.info('Saving model!')
+            torch.save(model.state_dict(), checkpoint)
+            logger.info(f'Model saved: {checkpoint}')
+        else:
+            e_count += 1
+        if e_count == patience:
+            break
         logger.info(
-            f'Epoch {epoch} | train_loss={train_loss / len(train_dataloader):.4f}'
+            f'Epoch {epoch} | train_loss={train_loss / len(train_dataloader):.4f} | mrr={full_mrr:.4f}'
         )
-    logger.info('Saving model!')
-    torch.save(model.state_dict(), checkpoint)
-    logger.info(f'Model saved: {checkpoint}')
 
 
 def evaluate(eval_dataset, model, batch_size_eval=5000, input_ids_code='input_ids_tokens', inputs_ids_nl='input_ids_nl',
@@ -160,6 +184,12 @@ def main():
     parser = HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
+    file = logging.FileHandler(model_args.checkpoint + '.log')
+    file.setLevel(level=logging.INFO)
+    formatter = logging.Formatter('[%(asctime)s | %(filename)s | line %(lineno)d] - %(levelname)s: %(message)s')
+    file.setFormatter(formatter)
+    logger.addHandler(file)
+
     set_seed(training_args.seed)
     if not model_args.is_baseline:
         model = AutoModel.from_pretrained(model_args.model_name_or_path)
@@ -167,7 +197,23 @@ def main():
         config = AutoConfig.from_pretrained(model_args.model_name_or_path)
         config.num_hidden_layers = 6
         model = RobertaModel(config)
+
+    if model_args.lora:
+        peft_config = LoraConfig(r=8, lora_alpha=16, lora_dropout=0.1, task_type=TaskType.FEATURE_EXTRACTION)
+        model = get_peft_model(model, peft_config)
+    elif model_args.prefix_tuning:
+        peft_config = PrefixTuningConfig(task_type=TaskType.FEATURE_EXTRACTION, inference_mode=False,
+                                         num_virtual_tokens=20, prefix_projection=True)
+        model = get_peft_model(model, peft_config)
     dual_encoder_model = DualEncoderModel(model, model)
+    if model_args.telly > 0:
+        for n, p in dual_encoder_model.named_parameters():
+            if 'embeddings' in n:
+                p.requires_grad = False
+            for j in range(0, model_args.telly):
+                if f'encoder.layer.{j}.' in n:
+                    p.requires_grad = False
+
     tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)
 
     dataset = load_dataset(data_args.data_path_hf)
@@ -189,6 +235,7 @@ def main():
 
     if training_args.do_train:
         train(train_set=dataset["train"],
+              eval_dataset=dataset["valid"],
               model=dual_encoder_model,
               checkpoint=model_args.checkpoint,
               batch_size_train=training_args.per_device_train_batch_size,
@@ -200,7 +247,10 @@ def main():
               input_ids_code='input_ids_tokens',
               inputs_ids_nl='input_ids_nl',
               attention_mask_code='attention_mask_tokens',
-              attention_mask_nl='attention_mask_nl')
+              attention_mask_nl='attention_mask_nl',
+              batch_size_eval=training_args.batch_size_eval,
+              patience=training_args.patience)
+
 
     dual_encoder_model.load_state_dict(torch.load(model_args.checkpoint))
     dual_encoder_model.to(DEVICE)
@@ -217,6 +267,9 @@ def main():
     logger.info(f'Full mrr: {np.mean(rrs[0] + rrs[1]):.4f}')
     logger.info(f'T-test: {ttest_ind(rrs[0], rrs[1]).pvalue:.4f}')
     logger.info(f'Cohen d: {cohend(rrs[0], rrs[1]):.4f}')
+
+    with open(f'{model_args.checkpoint}.pkl', 'wb') as handle:
+        pickle.dump(rrs, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == '__main__':

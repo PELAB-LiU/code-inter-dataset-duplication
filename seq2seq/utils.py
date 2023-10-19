@@ -1,9 +1,22 @@
 import tempfile
 
 from datasets import load_dataset
+from peft import TaskType, get_peft_model, LoraConfig, PrefixTuningConfig
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, EncoderDecoderModel, AutoConfig, RobertaModel
 
 from args import ModelArguments, DataArguments
+
+
+def print_trainable_parameters(model):
+    trainable_params = 0
+    all_param = 0
+    for param in model.parameters():
+        all_param += param.numel()
+        if param.requires_grad:
+            trainable_params += param.numel()
+    print(
+        f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
+    )
 
 
 def load_splits(args: DataArguments):
@@ -69,7 +82,19 @@ def load_model_tokenizers_seq2seq(args: ModelArguments):
         model.config.pad_token_id = tokenizer_target.pad_token_id
     else:
         raise NotImplementedError()
-    print(f"Learneable params: {sum(p.numel() for p in set(model.parameters()))}")
+    if args.telly:
+        for p in model.encoder.parameters():
+            p.requires_grad = False
+    if args.lora:
+        peft_config = LoraConfig(r=args.r, lora_alpha=args.alpha,
+                                 lora_dropout=0.1, task_type=TaskType.SEQ_2_SEQ_LM,
+                                 target_modules=['.q', '.v', '.o', '.k'])  # r=8, check lora alpha
+        model = get_peft_model(model, peft_config)
+    if args.prefix_tuning:
+        peft_config = PrefixTuningConfig(task_type=TaskType.SEQ_2_SEQ_LM, inference_mode=False,
+                                         num_virtual_tokens=20, prefix_projection=True)
+        model = get_peft_model(model, peft_config)
+    print_trainable_parameters(model)
     return model, tokenizer_source, tokenizer_target
 
 

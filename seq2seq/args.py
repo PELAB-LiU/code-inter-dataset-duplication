@@ -12,6 +12,11 @@ class ModelArguments:
     encoder: Optional[str] = field(default="microsoft/codebert-base")
     decoder: Optional[str] = field(default="microsoft/codebert-base")
     decoder_rand_layers: int = field(default=6)
+    telly: bool = field(default=False)
+    lora: bool = field(default=False)
+    prefix_tuning: bool = field(default=False)
+    r: int = field(default=8)
+    alpha: int = field(default=16)
 
 
 @dataclass
@@ -51,11 +56,11 @@ class TrainingArguments(Seq2SeqTrainingArguments):
     load_best_model_at_end: bool = field(default=True)
     save_total_limit: int = field(default=1)
 
-    predict_with_generate: bool = field(default=True)
-    generation_max_length: int = field(default=512)
+    predict_with_generate: bool = field(default=False)
+    generation_max_length: int = field(default=128)
     generation_num_beams: int = field(default=10)
-    metric_for_best_model: str = field(default="bleu")
-    greater_is_better: bool = field(default=True)
+    metric_for_best_model: str = field(default=None)  # code2text, func, codetrans
+    greater_is_better: bool = field(default=None)
 
 
 @dataclass
@@ -67,3 +72,6 @@ class EvaluationArguments:
     max_length_target: int = field(default=128)
     num_beams: int = field(default=10)
     include_idx: bool = field(default=False)
+    lora: bool = field(default=False)
+    base_model: str = field(default=None)
+    prefix_tuning: bool = field(default=False)
