@@ -6,17 +6,18 @@ from collections import defaultdict
 
 import numpy as np
 import torch
+import wandb
+from args import DataArguments, ModelArguments, TrainingArguments
 from datasets import load_dataset
-from peft import TaskType, LoraConfig, get_peft_model, PrefixTuningConfig
+from peft import LoraConfig, PrefixTuningConfig, TaskType, get_peft_model
 from scipy.stats import ttest_ind
 from torch import nn
 from torch.utils.data import DataLoader
 from torchmetrics.functional import retrieval_reciprocal_rank
 from tqdm import tqdm
-from transformers import HfArgumentParser, AutoModel, AutoTokenizer, AdamW, get_linear_schedule_with_warmup, AutoConfig, \
-    RobertaModel
-
-from args import ModelArguments, DataArguments, TrainingArguments
+from transformers import (AdamW, AutoConfig, AutoModel, AutoTokenizer,
+                          HfArgumentParser, RobertaModel,
+                          get_linear_schedule_with_warmup)
 
 logger = logging.getLogger()
 logger.setLevel(level=logging.INFO)
@@ -73,7 +74,9 @@ def train(train_set, eval_dataset,
           log_steps=100, input_ids_code='input_ids_tokens', inputs_ids_nl='input_ids_nl',
           attention_mask_code='attention_mask_tokens', attention_mask_nl='attention_mask_nl',
           batch_size_eval=1000,
-          patience=2):
+          patience=2,
+          wandb_logger=None
+          ):
     train_set.set_format("torch")
     train_dataloader = DataLoader(train_set, shuffle=True, batch_size=batch_size_train)
     model.to(DEVICE)
@@ -125,6 +128,14 @@ def train(train_set, eval_dataset,
                 logger.info(
                     f'Epoch {epoch} | step={steps} | train_loss={train_loss / (j + 1):.4f}'
                 )
+                if wandb_logger is not None:
+                    wandb_logger.log(
+                        {
+                            'train_loss': train_loss / (j + 1),
+                            'epoch': epoch
+                        },
+                        step=steps,
+                    )
         rrs = evaluate(eval_dataset=eval_dataset,
                        model=model,
                        batch_size_eval=batch_size_eval,
@@ -146,6 +157,15 @@ def train(train_set, eval_dataset,
         logger.info(
             f'Epoch {epoch} | train_loss={train_loss / len(train_dataloader):.4f} | mrr={full_mrr:.4f}'
         )
+        if wandb_logger is not None:
+            wandb_logger.log(
+                {
+                    'train_loss': train_loss / len(train_dataloader),
+                    'mrr': full_mrr,
+                    'epoch': epoch
+                },
+                step = steps
+            )
 
 
 def evaluate(eval_dataset, model, batch_size_eval=5000, input_ids_code='input_ids_tokens', inputs_ids_nl='input_ids_nl',
@@ -234,6 +254,12 @@ def main():
     full_test_dataset = dataset["test"]
 
     if training_args.do_train:
+        wandb_logger = wandb.init(project="code-inter-dataset-duplication", config={
+            'model_args': model_args,
+            'data_args': data_args,
+            'training_args': training_args
+        })
+
         train(train_set=dataset["train"],
               eval_dataset=dataset["valid"],
               model=dual_encoder_model,
@@ -249,7 +275,7 @@ def main():
               attention_mask_code='attention_mask_tokens',
               attention_mask_nl='attention_mask_nl',
               batch_size_eval=training_args.batch_size_eval,
-              patience=training_args.patience)
+              patience=training_args.patience, wandb_logger=wandb_logger)
 
 
     dual_encoder_model.load_state_dict(torch.load(model_args.checkpoint))
@@ -267,6 +293,13 @@ def main():
     logger.info(f'Full mrr: {np.mean(rrs[0] + rrs[1]):.4f}')
     logger.info(f'T-test: {ttest_ind(rrs[0], rrs[1]).pvalue:.4f}')
     logger.info(f'Cohen d: {cohend(rrs[0], rrs[1]):.4f}')
+
+    wandb_logger.log({
+        'mrrs': mrrs,
+        'full_mrr': np.mean(rrs[0] + rrs[1]),
+        't-test': ttest_ind(rrs[0], rrs[1]).pvalue,
+        'cohen_d': cohend(rrs[0], rrs[1])
+    })
 
     with open(f'{model_args.checkpoint}.pkl', 'wb') as handle:
         pickle.dump(rrs, handle, protocol=pickle.HIGHEST_PROTOCOL)
