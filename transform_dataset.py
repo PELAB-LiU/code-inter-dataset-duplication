@@ -13,6 +13,13 @@ def get_input_output(tokens, lang):
                 position = j + 1
                 break
         return [t if j != position else KEY_WORD for j, t in enumerate(tokens)], tokens[position]
+    elif lang == 'java':
+        position = None
+        for j, t in enumerate(tokens):
+            if t == '(':
+                position = j - 1
+                break
+        return [t if j != position else KEY_WORD for j, t in enumerate(tokens)], tokens[position]
 
 
 def mapping_function(example, lang):
