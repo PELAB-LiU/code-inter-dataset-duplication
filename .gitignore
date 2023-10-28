@@ -285,3 +285,8 @@ representatives.json
 /seq2seq/robertajava_code2text_python-150/
 /seq2seq/robertajavascript_code2text_python-150/
 /seq2seq/t5_code2text_python-150/
+
+*.csv
+/seq2seq/code2text/
+/seq2seq/codetrans/
+/seq2seq/func/
