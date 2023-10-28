@@ -5,7 +5,7 @@ from transformers import HfArgumentParser, Seq2SeqTrainer, EarlyStoppingCallback
 
 from args import ModelArguments, TrainingArguments, DataArguments
 from evaluation_metrics import get_normalization, f1_subtokens, nltk_sentence_bleu
-from utils import load_splits, load_model_tokenizers_seq2seq
+from utils import load_splits, load_model_tokenizers_seq2seq, set_seed
 
 
 def tokenize_function(examples, prefix, tokenizer_source, tokenizer_target, source_column,
@@ -68,6 +68,7 @@ def compute_metrics(eval_pred, tokenizer, task="code2text"):
 def main():
     parser = HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    set_seed(training_args.seed)
 
     model, tokenizer_source, tokenizer_target = load_model_tokenizers_seq2seq(model_args)
 

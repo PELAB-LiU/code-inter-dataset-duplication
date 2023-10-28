@@ -1,5 +1,9 @@
+import os
+import random
 import tempfile
 
+import numpy as np
+import torch
 from datasets import load_dataset
 from peft import TaskType, get_peft_model, LoraConfig, PrefixTuningConfig
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, EncoderDecoderModel, AutoConfig, RobertaModel
@@ -73,7 +77,7 @@ def load_model_tokenizers_seq2seq(args: ModelArguments):
             # encoder
             config = AutoConfig.from_pretrained(args.encoder)
             rand_encoder = RobertaModel(config)
-            config.num_hidden_layers = 6
+            config.num_hidden_layers = args.encoder_rand_layers
             rand_encoder.save_pretrained(tmp_dirname_2)
 
             model = EncoderDecoderModel.from_encoder_decoder_pretrained(tmp_dirname_2, tmp_dirname)
@@ -106,3 +110,18 @@ def save_list(l, path, include_idx=False):
     else:
         with open(path, 'w') as file:
             file.write('\n'.join(l_idx))
+
+
+def set_seed(seed: int):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
+    torch.use_deterministic_algorithms(True)
+
+    # Enable CUDNN deterministic mode
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False

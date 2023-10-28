@@ -29,10 +29,18 @@ def f1_subtokens(pred, label):
         return 2 * prec * recall / (prec + recall)
 
 
-def get_normalization(task):
+def camel_case_split(identifier):
+    matches = re.finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', identifier)
+    return [m.group(0) for m in matches]
+
+
+def get_normalization(task, lang='python'):
     if task == 'code2text':
         return lambda s: split_puncts(s.lower().strip())
     elif task == 'codetrans':
         return lambda s: s.strip().split()
     elif task == 'func':
-        return lambda s: [t.lower() for t in s.strip().split('_') if t != '']
+        if lang == 'python':
+            return lambda s: [t.lower() for t in s.strip().split('_') if t != '']
+        elif lang == 'java':
+            return lambda s: [t.lower() for t in camel_case_split(s.strip()) if t != '']
