@@ -64,6 +64,15 @@ def overlapping(G, source_dataset, target_dataset):
     else:
         print(f'Number of duplicates in test set: {len(duplicates_test_set)}')
         print(f'Percentage of duplication within test set: {len(duplicates_test_set) / len(test_set) * 100:.2f}%')
+
+    duplicates_train_set = [n for n in set(result) if G_filtered.nodes[n]['split_within_dataset'] == 'train']
+    train_set = [n for n in G_filtered.nodes if G_filtered.nodes[n]['split_within_dataset'] == 'train'
+                    and G_filtered.nodes[n]['dataset'] == source_dataset]
+    if len(train_set) == 0:
+        print(f'Train set not defined in {source_dataset}')
+    else:
+        print(f'Number of duplicates in train set: {len(duplicates_train_set)}')
+        print(f'Percentage of duplication within train set: {len(duplicates_train_set) / len(train_set) * 100:.2f}%')
     return list(set(ids_within_dataset))
 
 
