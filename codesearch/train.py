@@ -209,13 +209,14 @@ def main():
     formatter = logging.Formatter('[%(asctime)s | %(filename)s | line %(lineno)d] - %(levelname)s: %(message)s')
     file.setFormatter(formatter)
     logger.addHandler(file)
-
+    
+    logger.info(f"seed: {training_args.seed}")
     set_seed(training_args.seed)
     if not model_args.is_baseline:
         model = AutoModel.from_pretrained(model_args.model_name_or_path)
     else:
         config = AutoConfig.from_pretrained(model_args.model_name_or_path)
-        config.num_hidden_layers = 6
+        config.num_hidden_layers = model_args.num_layers
         model = RobertaModel(config)
 
     if model_args.lora:
@@ -254,11 +255,12 @@ def main():
     full_test_dataset = dataset["test"]
 
     if training_args.do_train:
-        wandb_logger = wandb.init(project="code-inter-dataset-duplication", config={
-            'model_args': model_args,
-            'data_args': data_args,
-            'training_args': training_args
-        })
+        # wandb_logger = wandb.init(project="code-inter-dataset-duplication", config={
+        #     'model_args': model_args,
+        #     'data_args': data_args,
+        #     'training_args': training_args
+        # })
+        wandb_logger = None
 
         train(train_set=dataset["train"],
               eval_dataset=dataset["valid"],
@@ -294,12 +296,12 @@ def main():
     logger.info(f'T-test: {ttest_ind(rrs[0], rrs[1]).pvalue:.4f}')
     logger.info(f'Cohen d: {cohend(rrs[0], rrs[1]):.4f}')
 
-    wandb_logger.log({
-        'mrrs': mrrs,
-        'full_mrr': np.mean(rrs[0] + rrs[1]),
-        't-test': ttest_ind(rrs[0], rrs[1]).pvalue,
-        'cohen_d': cohend(rrs[0], rrs[1])
-    })
+    # wandb_logger.log({
+    #     'mrrs': mrrs,
+    #     'full_mrr': np.mean(rrs[0] + rrs[1]),
+    #     't-test': ttest_ind(rrs[0], rrs[1]).pvalue,
+    #     'cohen_d': cohend(rrs[0], rrs[1])
+    # })
 
     with open(f'{model_args.checkpoint}.pkl', 'wb') as handle:
         pickle.dump(rrs, handle, protocol=pickle.HIGHEST_PROTOCOL)

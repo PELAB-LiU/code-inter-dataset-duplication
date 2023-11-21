@@ -1,5 +1,6 @@
+seed=123
 
-for t in {12..1}
+for t in $(seq 6 12)
 do
   python train.py \
     --checkpoint "graphcodebert_python-150_telly$t.bin" \
@@ -11,5 +12,6 @@ do
     --max_nl_len 128 \
     --do_train \
     --telly $t \
-    --model_name_or_path "microsoft/graphcodebert-base"
+    --model_name_or_path "microsoft/graphcodebert-base" \
+    --seed $seed
 done
