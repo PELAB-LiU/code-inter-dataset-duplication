@@ -1,10 +1,11 @@
+import json
 import os
 import random
 import tempfile
 
 import numpy as np
 import torch
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
 from peft import TaskType, get_peft_model, LoraConfig, PrefixTuningConfig
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, EncoderDecoderModel, AutoConfig, RobertaModel
 
@@ -24,7 +25,16 @@ def print_trainable_parameters(model):
 
 
 def load_splits(args: DataArguments):
-    return load_dataset(args.data_path_hf)
+    d = load_dataset(args.data_path_hf)
+    print(d)
+    if args.filter_pretraining:
+        d['train'] = d['train'].filter(lambda x: not x['is_duplicated'])
+        return d
+    if args.augment_duplicates:
+        dups = d['train'].filter(lambda x: x['is_duplicated'])
+        d['train'] = concatenate_datasets([d['train'], dups])
+    print(d)
+    return d
 
 
 def load_model_tokenizers_seq2seq(args: ModelArguments):
@@ -105,8 +115,8 @@ def load_model_tokenizers_seq2seq(args: ModelArguments):
 def save_list(l, path, include_idx=False):
     l_idx = [f"{i}\t{t}" for i, t in enumerate(l)]
     if not include_idx:
-        with open(path, 'w') as file:
-            file.write('\n'.join(l))
+        with open(path, 'w') as f:
+            json.dump(l, f)
     else:
         with open(path, 'w') as file:
             file.write('\n'.join(l_idx))

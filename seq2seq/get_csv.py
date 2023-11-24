@@ -1,3 +1,4 @@
+import argparse
 from collections import defaultdict
 
 import numpy as np
@@ -6,19 +7,29 @@ from tqdm import tqdm
 
 from analyze_results import get_avg_metrics
 
-FOLDER = 'codetrans'
-SEEDS = [72, 123, 93]
-MODELS = ['t5', 'bart', 'rand66', 'rand33', 'rand63', 'codet5_lora', 'codet5_ff', 'codet5_prefix', 't5v1']
-TASKS = 'codetrans'
-OUTPUT = 'results_codetrans.csv'
-LANG = 'java'
+SEEDS = [123, 72, 93, 12345, 789]
+MODELS = ['bart', 'rand66', 'rand33', 'rand63', 'codet5_ff', 't5v1', 'codet5large_ff',
+          'codet5small_ff', 't5_fpfalse']
+
+# parse arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--folder', type=str, required=True)
+parser.add_argument('--task', type=str, required=True)
+parser.add_argument('--lang', type=str, required=True)
+parser.add_argument('--output', type=str, required=True)
+args = parser.parse_args()
+
 
 results_dict = defaultdict(list)
 
 for seed in SEEDS:
     for model in tqdm(MODELS):
-        folder = f'{FOLDER}/seed_{seed}/{model}/best_checkpoint'
-        full, dup, no_dup = get_avg_metrics(TASKS, folder, LANG)
+        folder = f'{args.folder}/seed_{seed}/{model}/best_checkpoint'
+        try:
+            full, dup, no_dup = get_avg_metrics(args.task, folder, args.lang)
+        except:
+            print(f'Cannot read {folder}')
+            continue
 
         results_dict['model'].append(model)
         results_dict['seed'].append(seed)
@@ -27,4 +38,4 @@ for seed in SEEDS:
         results_dict['full'].append(np.mean(full))
 
 pd_df = pd.DataFrame.from_dict(results_dict)
-pd_df.to_csv(OUTPUT)
+pd_df.to_csv(args.output)

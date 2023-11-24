@@ -35,6 +35,8 @@ class DataArguments:
     is_split_target: bool = field(default=False)
 
     prefix: Optional[str] = field(default=None)
+    filter_pretraining: bool = field(default=False)
+    augment_duplicates: bool = field(default=False)
 
 
 @dataclass

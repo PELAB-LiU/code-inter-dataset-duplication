@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 
 import numpy as np
@@ -11,10 +12,10 @@ def read_data(path, part, normalization):
     references_path = os.path.join(path, 'references' + f'_{part}.txt')
     predictions_path = os.path.join(path, 'predictions' + f'_{part}.txt')
     with open(references_path) as file:
-        lines_references = file.readlines()
+        lines_references = json.load(file)
     references = [normalization(s) for s in lines_references]
     with open(predictions_path) as file:
-        lines_predictions = file.readlines()
+        lines_predictions = json.load(file)
     predictions = [normalization(s) for s in lines_predictions]
     return references, predictions
 

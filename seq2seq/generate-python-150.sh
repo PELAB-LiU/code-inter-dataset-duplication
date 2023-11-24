@@ -1,4 +1,3 @@
-
 # Check if there are no arguments
 if [ $# -eq 0 ]; then
     echo "Error: No arguments provided. Please provide at least one argument."
@@ -14,27 +13,44 @@ fi
 path="$1"
 echo "Path: $path"
 
-seeds=(12345 789)
+seeds=(123 12345 789 72 93)
 
 for seed in "${seeds[@]}";
 do
   echo "Seed: $seed"
-  #T5
-  python train.py \
-    --architecture "encoder-decoder" \
-    --encoder_decoder "t5-base" \
+
+  python generate_predictions.py \
+    --checkpoint "$path/code2text/seed_$seed/codet5small_ff/best_checkpoint" \
+    --tokenizer_source "Salesforce/codet5-small" \
+    --tokenizer_target "Salesforce/codet5-small" \
     --data_path_hf "antolin/python-150_interduplication" \
     --source_column "tokens" \
     --is_split_source \
     --target_column "nl" \
-    --output_dir "$path/code2text/seed_$seed/t5" \
-    --num_train_epochs 10 \
     --max_length_source 256 \
-    --max_length_target 128 \
-    --patience 3 \
-    --generation_max_length 128 \
-    --prefix "Summarize Python: " \
-    --seed $seed
+    --max_length_target 128
+
+  python generate_predictions.py \
+    --checkpoint "$path/code2text/seed_$seed/codet5large_ff/best_checkpoint" \
+    --tokenizer_source "Salesforce/codet5-large" \
+    --tokenizer_target "Salesforce/codet5-large" \
+    --data_path_hf "antolin/python-150_interduplication" \
+    --source_column "tokens" \
+    --is_split_source \
+    --target_column "nl" \
+    --max_length_source 256 \
+    --max_length_target 128
+
+  python generate_predictions.py \
+    --checkpoint "$path/code2text/seed_$seed/codet5_ff/best_checkpoint" \
+    --tokenizer_source "Salesforce/codet5-base" \
+    --tokenizer_target "Salesforce/codet5-base" \
+    --data_path_hf "antolin/python-150_interduplication" \
+    --source_column "tokens" \
+    --is_split_source \
+    --target_column "nl" \
+    --max_length_source 256 \
+    --max_length_target 128
 
   python generate_predictions.py \
     --checkpoint "$path/code2text/seed_$seed/t5/best_checkpoint" \
@@ -48,22 +64,6 @@ do
     --max_length_target 128 \
     --prefix "Summarize Python: "
 
-  # bart
-  python train.py \
-    --architecture "encoder-decoder" \
-    --encoder_decoder "facebook/bart-base" \
-    --data_path_hf "antolin/python-150_interduplication" \
-    --source_column "tokens" \
-    --is_split_source \
-    --target_column "nl" \
-    --output_dir "$path/code2text/seed_$seed/bart" \
-    --num_train_epochs 10 \
-    --max_length_source 256 \
-    --max_length_target 128 \
-    --patience 3 \
-    --generation_max_length 128 \
-    --seed $seed
-
   python generate_predictions.py \
     --checkpoint "$path/code2text/seed_$seed/bart/best_checkpoint" \
     --tokenizer_source "facebook/bart-base" \
@@ -74,24 +74,6 @@ do
     --target_column "nl" \
     --max_length_source 256 \
     --max_length_target 128
-
-  #T5v1
-  python train.py \
-    --architecture "encoder-decoder" \
-    --encoder_decoder "google/t5-v1_1-small" \
-    --data_path_hf "antolin/python-150_interduplication" \
-    --source_column "tokens" \
-    --is_split_source \
-    --target_column "nl" \
-    --output_dir "$path/code2text/seed_$seed/t5v1" \
-    --num_train_epochs 10 \
-    --max_length_source 256 \
-    --max_length_target 128 \
-    --patience 3 \
-    --generation_max_length 128 \
-    --prefix "Summarize Python: " \
-    --fp16 False \
-    --seed $seed
 
   python generate_predictions.py \
     --checkpoint "$path/code2text/seed_$seed/t5v1/best_checkpoint" \
@@ -105,22 +87,6 @@ do
     --max_length_target 128 \
     --prefix "Summarize Python: "
 
-  # rand rand
-  python train.py \
-    --architecture "rand+rand" \
-    --encoder "microsoft/codebert-base" \
-    --data_path_hf "antolin/python-150_interduplication" \
-    --source_column "tokens" \
-    --is_split_source \
-    --target_column "nl" \
-    --output_dir "$path/code2text/seed_$seed/rand66" \
-    --num_train_epochs 10 \
-    --max_length_source 256 \
-    --max_length_target 128 \
-    --patience 3 \
-    --generation_max_length 128 \
-    --seed $seed
-
   python generate_predictions.py \
     --checkpoint "$path/code2text/seed_$seed/rand66/best_checkpoint" \
     --tokenizer_source "microsoft/codebert-base" \
@@ -131,22 +97,6 @@ do
     --target_column "nl" \
     --max_length_source 256 \
     --max_length_target 128
-
-  python train.py \
-    --architecture "rand+rand" \
-    --encoder "microsoft/codebert-base" \
-    --data_path_hf "antolin/python-150_interduplication" \
-    --source_column "tokens" \
-    --is_split_source \
-    --target_column "nl" \
-    --output_dir "$path/code2text/seed_$seed/rand63" \
-    --num_train_epochs 10 \
-    --max_length_source 256 \
-    --max_length_target 128 \
-    --patience 3 \
-    --generation_max_length 128 \
-    --decoder_rand_layers 3 \
-    --seed $seed
 
   python generate_predictions.py \
     --checkpoint "$path/code2text/seed_$seed/rand63/best_checkpoint" \
@@ -159,23 +109,6 @@ do
     --max_length_source 256 \
     --max_length_target 128
 
-  python train.py \
-    --architecture "rand+rand" \
-    --encoder "microsoft/codebert-base" \
-    --data_path_hf "antolin/python-150_interduplication" \
-    --source_column "tokens" \
-    --is_split_source \
-    --target_column "nl" \
-    --output_dir "$path/code2text/seed_$seed/rand33" \
-    --num_train_epochs 10 \
-    --max_length_source 256 \
-    --max_length_target 128 \
-    --patience 3 \
-    --generation_max_length 128 \
-    --decoder_rand_layers 3 \
-    --encoder_rand_layers 3 \
-    --seed $seed
-
   python generate_predictions.py \
     --checkpoint "$path/code2text/seed_$seed/rand33/best_checkpoint" \
     --tokenizer_source "microsoft/codebert-base" \
@@ -186,4 +119,5 @@ do
     --target_column "nl" \
     --max_length_source 256 \
     --max_length_target 128
+
 done

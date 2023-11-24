@@ -36,7 +36,7 @@ def camel_case_split(identifier):
 
 def get_normalization(task, lang='python'):
     if task == 'code2text':
-        return lambda s: split_puncts(s.lower().strip())
+        return lambda s: split_puncts(s.lower().strip()).split()
     elif task == 'codetrans':
         return lambda s: s.strip().split()
     elif task == 'func':
