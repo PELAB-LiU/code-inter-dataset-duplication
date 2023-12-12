@@ -9,7 +9,7 @@ from analyze_results import get_avg_metrics
 
 SEEDS = [123, 72, 93, 12345, 789]
 MODELS = ['bart', 'rand66', 'rand33', 'rand63', 'codet5_ff', 't5v1', 'codet5large_ff',
-          'codet5small_ff', 't5_fpfalse']
+          'codet5small_ff', 't5_fpfalse', 'codet5large_lora', 'codet5large_prefix']
 
 # parse arguments
 parser = argparse.ArgumentParser()

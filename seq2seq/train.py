@@ -104,12 +104,7 @@ def main():
     )
     trainer.train()
 
-    if model_args.prefix_tuning:
-        old_name = os.path.join(training_args.output_dir, os.listdir(training_args.output_dir)[0])
-        new_name = os.path.join(training_args.output_dir, 'best_checkpoint')
-        os.rename(old_name, new_name)
-    else:
-        trainer.save_model(os.path.join(training_args.output_dir, 'best_checkpoint'))
+    trainer.save_model(os.path.join(training_args.output_dir, 'best_checkpoint'))
 
 
 if __name__ == '__main__':

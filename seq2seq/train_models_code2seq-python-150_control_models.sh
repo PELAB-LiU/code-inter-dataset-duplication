@@ -27,17 +27,19 @@ do
     --source_column "tokens" \
     --is_split_source \
     --target_column "nl" \
-    --output_dir "$path/code2text/seed_$seed/t5" \
+    --output_dir "$path/code2text/seed_$seed/t5_fpfalse" \
     --num_train_epochs 10 \
     --max_length_source 256 \
     --max_length_target 128 \
     --patience 3 \
+    --fp16 False \
     --generation_max_length 128 \
     --prefix "Summarize Python: " \
-    --seed $seed
+    --seed $seed \
+    --per_device_train_batch_size 32
 
   python generate_predictions.py \
-    --checkpoint "$path/code2text/seed_$seed/t5/best_checkpoint" \
+    --checkpoint "$path/code2text/seed_$seed/t5_fpfalse/best_checkpoint" \
     --tokenizer_source "t5-base" \
     --tokenizer_target "t5-base" \
     --data_path_hf "antolin/python-150_interduplication" \

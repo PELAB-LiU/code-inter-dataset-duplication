@@ -19,14 +19,14 @@ seeds=(123 72 93 12345 789)
 for seed in "${seeds[@]}";
 do
   echo "Seed: $seed"
-#T5
+  #T5
   python train.py \
     --architecture "encoder-decoder" \
     --encoder_decoder "t5-base" \
     --data_path_hf "antolin/codetrans_interduplication" \
     --source_column "snippet" \
     --target_column "cs" \
-    --output_dir "$path/codetrans/seed_$seed/t5" \
+    --output_dir "$path/codetrans/seed_$seed/t5_fpfalse" \
     --max_length_source 512 \
     --max_length_target 512 \
     --num_train_epochs 150 \
@@ -39,11 +39,12 @@ do
     --per_device_train_batch_size 16 \
     --save_steps 5000 \
     --seed $seed \
-    --learning_rate 4e-5
+    --learning_rate 4e-5 \
+    --fp16 False
 
 
   python generate_predictions.py \
-    --checkpoint "$path/codetrans/seed_$seed/t5/best_checkpoint" \
+    --checkpoint "$path/codetrans/seed_$seed/t5_fpfalse/best_checkpoint" \
     --tokenizer_source "t5-base" \
     --tokenizer_target "t5-base" \
     --data_path_hf "antolin/codetrans_interduplication" \
