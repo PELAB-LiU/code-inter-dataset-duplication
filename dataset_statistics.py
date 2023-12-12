@@ -1,5 +1,6 @@
 import argparse
 import json
+import math
 from re import finditer
 
 import lizard
@@ -28,6 +29,14 @@ def normalize_code(tokens, lang):
             if '_' in t:
                 new_tokens += t.split('_')
     return [t.lower() for t in new_tokens if t != '']
+
+
+def cohen_d(group1, group2):
+    """Calculate Cohen's d for two groups."""
+    mean_diff = abs(np.mean(group1) - np.mean(group2))
+    pooled_std = math.sqrt((np.std(group1, ddof=1) ** 2 + np.std(group2, ddof=1) ** 2) / 2)
+    cohen_d = mean_diff / pooled_std
+    return cohen_d
 
 
 def compute_statistics(dataset, lang, inter, task, rep, split):
@@ -69,30 +78,42 @@ def compute_statistics(dataset, lang, inter, task, rep, split):
     print(f'Samples duplicated: {len(g_dup)}')
     print(f'Samples non-duplicated: {len(g_nondup)}')
 
+    print(f'Avg tokens length without filtering (duplicated): {np.mean([len(p["tokens"]) for p in g_dup]):.2f}'
+          f'+- {np.std([len(p["tokens"]) for p in g_dup]):.2f}')
+    print(f'Avg tokens length without filtering (non-duplicated): {np.mean([len(p["tokens"]) for p in g_nondup]):.2f}'
+          f'+- {np.std([len(p["tokens"]) for p in g_nondup]):.2f}')
+    print(f'Effect size: {cohen_d([len(p["tokens"]) for p in g_dup], [len(p["tokens"]) for p in g_nondup]):.2f}')
+
     print(f'Avg tokens length (duplicated): {np.mean([len(p["tokens_filtered"]) for p in g_dup]):.2f}'
           f'+- {np.std([len(p["tokens_filtered"]) for p in g_dup]):.2f}')
     print(f'Avg tokens length (non-duplicated): {np.mean([len(p["tokens_filtered"]) for p in g_nondup]):.2f}'
           f'+- {np.std([len(p["tokens_filtered"]) for p in g_nondup]):.2f}')
     print(f'p-val: '
           f'{ttest_ind([len(p["tokens_filtered"]) for p in g_dup], [len(p["tokens_filtered"]) for p in g_nondup]).pvalue:.2f}')
+    print(
+        f'Effect size: {cohen_d([len(p["tokens_filtered"]) for p in g_dup], [len(p["tokens_filtered"]) for p in g_nondup]):.2f}')
 
     print(f'Avg cc (duplicated): {np.mean([p["cc"] for p in g_dup]):.2f} +- {np.std([p["cc"] for p in g_dup]):.2f}')
     print(f'Avg cc (non-duplicated): {np.mean([p["cc"] for p in g_nondup]):.2f} '
           f'+- {np.std([p["cc"] for p in g_nondup]):.2f}')
     print(f'p-val: '
           f'{ttest_ind([p["cc"] for p in g_dup], [p["cc"] for p in g_nondup]).pvalue:.4f}')
+    print(f'Effect size: {cohen_d([p["cc"] for p in g_dup], [p["cc"] for p in g_nondup]):.2f}')
 
     if task == "code2text":
         # overlapping snippet nl
-        overlap_dup = [len(set(normalize_code(p['tokens'], lang)).intersection(set(p['nl'].lower().split()))) / len(set(p['nl'].lower().split()))
+        overlap_dup = [len(set(normalize_code(p['tokens'], lang)).intersection(set(p['nl'].lower().split()))) / len(
+            set(p['nl'].lower().split()))
                        for p in g_dup]
-        overlap_nondup = [len(set(normalize_code(p['tokens'], lang)).intersection(set(p['nl'].lower().split()))) / len(set(p['nl'].lower().split()))
+        overlap_nondup = [len(set(normalize_code(p['tokens'], lang)).intersection(set(p['nl'].lower().split()))) / len(
+            set(p['nl'].lower().split()))
                           for p in g_nondup]
         print(f'Avg overlapping snippet nl (duplicated): {np.mean(overlap_dup):.2f} +- {np.std(overlap_dup):.2f}')
         print(f'Avg overlapping snippet nl (non-duplicated): {np.mean(overlap_nondup):.2f} '
               f'+- {np.std(overlap_nondup):.2f}')
         print(f'p-val: '
               f'{ttest_ind(overlap_dup, overlap_nondup).pvalue:.4f}')
+        print(f'Effect size: {cohen_d(overlap_dup, overlap_nondup):.2f}')
 
 
 def main(args):

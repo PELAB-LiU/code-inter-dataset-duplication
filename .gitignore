@@ -298,3 +298,8 @@ representatives.json
 /tlc/valid.token.nl
 /dataset_overlapping_java.txt
 /dataset_overlapping_python.txt
+/overlapping_java_without_rep.txt
+/overlapping_py_without_rep.txt
+/statistics_codetrans.txt
+/statistics_python150.txt
+/statistics_tlc.txt
