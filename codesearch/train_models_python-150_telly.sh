@@ -1,8 +1,9 @@
+seed=123
 
-for t in {12..1}
+for t in $(seq 1 12)
 do
   python train.py \
-    --checkpoint "graphcodebert_python-150_telly$t.bin" \
+    --checkpoint "unixcoder_python-150_telly$t.bin" \
     --data_path_hf "antolin/python-150_interduplication" \
     --tokens_column "tokens" \
     --nl_column "nl" \
@@ -11,5 +12,6 @@ do
     --max_nl_len 128 \
     --do_train \
     --telly $t \
-    --model_name_or_path "microsoft/graphcodebert-base"
+    --model_name_or_path "microsoft/unixcoder-base" \
+    --seed $seed
 done
