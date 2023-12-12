@@ -24,7 +24,7 @@ def main(args):
                                "test": test_dataset,
                                "valid": valid_dataset})
     print(new_dataset)
-    new_dataset.push_to_hub(args.hf_dataset, private=True)
+    new_dataset.push_to_hub(args.hf_dataset, private=False)
 
 
 if __name__ == '__main__':

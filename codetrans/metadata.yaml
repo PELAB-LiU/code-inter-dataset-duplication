@@ -1,4 +1,4 @@
 
 id: codetrans
-url: 'https://raw.githubusercontent.com/microsoft/CodeXGLUE/main/Code-Code/code-to-code-trans/data/test.java-cs.txt.java'
+url: 'https://github.com/microsoft/CodeXGLUE'
 language: java

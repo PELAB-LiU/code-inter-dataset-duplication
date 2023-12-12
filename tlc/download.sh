@@ -1,6 +1,8 @@
 
-wget --content-disposition https://figshare.com/ndownloader/files/30578028?private_link=fe32740133b33d719ab5
-tar -xf TLC_Dedup.tar.bz2
-cp TLC_Dedup/original/data.pkl data.pkl
-rm -rf TLC_Dedup
-rm -rf TLC_Dedup.tar.bz2
+wget https://raw.githubusercontent.com/xing-hu/TL-CodeSum/master/data/train/train.json
+wget https://raw.githubusercontent.com/xing-hu/TL-CodeSum/master/data/valid/valid.json
+wget https://raw.githubusercontent.com/xing-hu/TL-CodeSum/master/data/test/test.json
+wget https://raw.githubusercontent.com/xing-hu/TL-CodeSum/master/data/train/train.token.nl
+wget https://raw.githubusercontent.com/xing-hu/TL-CodeSum/master/data/valid/valid.token.nl
+wget https://raw.githubusercontent.com/xing-hu/TL-CodeSum/master/data/test/test.token.nl
+

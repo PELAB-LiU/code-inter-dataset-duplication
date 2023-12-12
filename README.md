@@ -1,40 +1,52 @@
-# code-inter-dataset-duplication
+# Inter-dataset code duplication
 
-Creation of empty database.
+This repository contains the code for the paper "On Inter-dataset Code Duplication 
+and Data Leakage in Large Language Models".
+
+## Creation of the inter-duplication database
+
+Here we describe the steps to create the inter-dataset code duplication database.
+
+1. Create an empty database using the provided SQL schema.
 ```shell
 sqlite3 interduplication.db < schema.sql
 ```
 
-## Download and index dataset
-
-Download and file generation (`data.jsonl`) and other files.
+2. Download and parse datasets for code duplication analysis.
 ```shell
 cd dataset_name
 ./download.sh
 python parse_dataset.py
 ```
 
-Index in the database.
+3. Index the dataset in the database.
 ```shell
 cd ..
 python register_in_db.py --data dataset_name/data.jsonl --meta dataset_name/metadata.yaml
 ```
 
-## Compute duplicates
+4. Compute code duplicates for the specified programming languages.
 ```shell
-python compute_duplicates.py --lang java|python
+python compute_duplicates.py --lang java
+python compute_duplicates.py --lang python
 ```
 
-## Compute inter-duplication percentages
-
-This computes the percentages of inter-duplication between codesearchnet and the rest of the datasets. It also saves a
-json file for each dataset containing the snippets that are in codesearchnet and the given dataset.
+5. Compute the percentages of inter-duplication between CodeSearchNet and other datasets.
 ```shell
 python dataset_overlapping.py --lang java|python
 ```
 
-## Upload to HF
+## Upload datasets to HF
 
+To upload datasets to Hugging Face's hub, perform the following steps:
+
+1. Compute inter-dataset duplication percentages and save representative data.
+```shell
+python dataset_overlapping.py --lang python --save_inter_representatives --compute_representatives
+python dataset_overlapping.py --lang java --save_inter_representatives --compute_representatives
+```
+
+2. Upload the dataset to HF, considering inter-duplicate and representative information.
 ```shell
 python upload_hf_dataset.py --data dataset_name/data.jsonl --inter dataset_name/interduplicates.json --rep dataset_name/representatives.json --hf_dataset hf_dir
 ```

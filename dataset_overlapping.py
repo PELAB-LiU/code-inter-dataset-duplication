@@ -64,6 +64,15 @@ def overlapping(G, source_dataset, target_dataset):
     else:
         print(f'Number of duplicates in test set: {len(duplicates_test_set)}')
         print(f'Percentage of duplication within test set: {len(duplicates_test_set) / len(test_set) * 100:.2f}%')
+
+    duplicates_train_set = [n for n in set(result) if G_filtered.nodes[n]['split_within_dataset'] == 'train']
+    train_set = [n for n in G_filtered.nodes if G_filtered.nodes[n]['split_within_dataset'] == 'train'
+                    and G_filtered.nodes[n]['dataset'] == source_dataset]
+    if len(train_set) == 0:
+        print(f'Train set not defined in {source_dataset}')
+    else:
+        print(f'Number of duplicates in train set: {len(duplicates_train_set)}')
+        print(f'Percentage of duplication within train set: {len(duplicates_train_set) / len(train_set) * 100:.2f}%')
     return list(set(ids_within_dataset))
 
 
@@ -81,16 +90,18 @@ def get_representative(G):
 
 def main(args):
     G = load_graph(args.db, args.lang)
-    G = get_representative(G)
+    if args.compute_representatives:
+        G = get_representative(G)
     datasets = set([d['dataset'] for n, d in G.nodes(data=True) if d['dataset'] != args.target_dataset])
     target_dataset = args.target_dataset
     for source_dataset in tqdm(datasets, desc='Computing overlapping'):
         nodes = overlapping(G, source_dataset, target_dataset)
-        with open(os.path.join(source_dataset, 'interduplicates.json'), 'w') as f:
-            json.dump(nodes, f)
-        with open(os.path.join(source_dataset, 'representatives.json'), 'w') as f:
-            json.dump([d['id_within_dataset'] for n, d in G.nodes(data=True)
-                       if d['dataset'] == source_dataset], f)
+        if args.save_inter_representatives:
+            with open(os.path.join(source_dataset, 'interduplicates.json'), 'w') as f:
+                json.dump(nodes, f)
+            with open(os.path.join(source_dataset, 'representatives.json'), 'w') as f:
+                json.dump([d['id_within_dataset'] for n, d in G.nodes(data=True)
+                           if d['dataset'] == source_dataset], f)
 
 
 if __name__ == '__main__':
@@ -98,5 +109,7 @@ if __name__ == '__main__':
     parser.add_argument('--db', type=str, default='interduplication.db')
     parser.add_argument('--lang', type=str, default='java')
     parser.add_argument('--target_dataset', type=str, default='codesearchnet')
+    parser.add_argument('--save_inter_representatives', action='store_true')
+    parser.add_argument('--compute_representatives', action='store_true')
     args = parser.parse_args()
     main(args)

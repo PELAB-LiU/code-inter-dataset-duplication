@@ -11,16 +11,22 @@ CREATE TABLE snippets (
 	tokens TEXT NOT NULL,
 	id_within_dataset integer NOT NULL,
 	split_within_dataset TEXT,
-	FOREIGN KEY (dataset)
-    REFERENCES datasets (id)
+	CONSTRAINT fk_dataset
+        FOREIGN KEY (dataset)
+        REFERENCES datasets (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE duplicates (
     id integer primary key autoincrement,
     snippet1 INT NOT NULL,
     snippet2 INT NOT NULL,
-    FOREIGN KEY (snippet1)
-    REFERENCES snippets (id),
-    FOREIGN KEY (snippet2)
-    REFERENCES snippets (id)
+    CONSTRAINT fk_snippet1
+        FOREIGN KEY (snippet1)
+        REFERENCES snippets (id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_snippet2
+        FOREIGN KEY (snippet2)
+        REFERENCES snippets (id)
+        ON DELETE CASCADE
 );

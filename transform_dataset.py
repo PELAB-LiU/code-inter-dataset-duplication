@@ -37,7 +37,7 @@ def main(args):
     input_dataset = load_dataset(args.input_dataset_hf)
     output_dataset = input_dataset.map(lambda example: mapping_function(example, args.lang))
     output_dataset = output_dataset.filter(filter_func_name)
-    output_dataset.push_to_hub(args.output_dataset_hf, private=True)
+    output_dataset.push_to_hub(args.output_dataset_hf, private=False)
 
 
 if __name__ == '__main__':
