@@ -16,7 +16,7 @@ TRAIN_PATH, TEST_PATH, VALID_PATH = 'train.txt', 'test.txt', 'valid.txt'
 TRAIN_JSONL_PATH, TEST_JSONL_PATH, VALID_JSONL_PATH = 'train.jsonl', 'test.jsonl', 'valid.jsonl'
 HF_PATH = 'antolin/bigclonebench_interduplication'
 UPLOAD = True
-DB_ACCESS = False
+DB_ACCESS = True
 
 with open(DATA_PATH, 'r') as json_file:
     json_list = list(json_file)
@@ -104,6 +104,8 @@ print('Length of problematic valid positive pairs: ', len([pair for pair in prob
 print(f'Percentage of problematic train pairs: {len(problematic_pairs_train) * 100 / len(train_pairs):.2f}')
 print(f'Percentage of problematic test pairs: {len(problematic_pairs_test) * 100 / len(test_pairs):.2f}')
 print(f'Percentage of problematic valid pairs: {len(problematic_pairs_valid) * 100 / len(valid_pairs):.2f}')
+print(f'Percentage of problematic pairs: '
+      f'{(len(problematic_pairs_train) + len(problematic_pairs_test) + len(problematic_pairs_valid)) * 100 / (len(train_pairs) + len(test_pairs) + len(valid_pairs)):.2f}')
 
 very_problematic_pairs_train = [pair for pair in train_pairs if pair[0] in interduplicates and pair[1] in interduplicates]
 very_problematic_pairs_test = [pair for pair in test_pairs if pair[0] in interduplicates and pair[1] in interduplicates]
@@ -115,6 +117,10 @@ print('Length of very problematic test pairs: ', len(very_problematic_pairs_test
 print('Length of very problematic test positive pairs: ', len([pair for pair in very_problematic_pairs_test if pair[2] == 1]))
 print('Length of very problematic valid pairs: ', len(very_problematic_pairs_valid))
 print('Length of very problematic valid positive pairs: ', len([pair for pair in very_problematic_pairs_valid if pair[2] == 1]))
+
+print(f'Percentage of very problematic train pairs: {len(very_problematic_pairs_train) * 100 / len(train_pairs):.2f}')
+print(f'Percentage of very problematic test pairs: {len(very_problematic_pairs_test) * 100 / len(test_pairs):.2f}')
+print(f'Percentage of very problematic valid pairs: {len(very_problematic_pairs_valid) * 100 / len(valid_pairs):.2f}')
 
 if UPLOAD:
     train_examples = []
