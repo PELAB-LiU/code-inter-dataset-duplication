@@ -8,6 +8,7 @@ from transformers import TrainingArguments
 class ModelArguments:
     encoder: Optional[str] = field(default="microsoft/codebert-base")
     is_baseline: bool = field(default=False)
+    layers: int = field(default=6)
 
 
 @dataclass
@@ -23,9 +24,9 @@ class DataArguments:
 class TrainingArguments(TrainingArguments):
     do_train: bool = field(default=False)
     max_length: int = field(default=512)
-    num_train_epochs: int = field(default=2)
-    per_device_train_batch_size: int = field(default=16)
-    per_device_eval_batch_size: int = field(default=8)
+    num_train_epochs: int = field(default=3)
+    per_device_train_batch_size: int = field(default=32)
+    per_device_eval_batch_size: int = field(default=32)
     gradient_accumulation_steps: int = field(default=1)
     fp16: bool = field(default=True)
     save_strategy: str = field(default="epoch")
