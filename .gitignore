@@ -302,3 +302,6 @@ representatives.json
 /statistics_codetrans.txt
 /statistics_python150.txt
 /statistics_tlc.txt
+/codesearchnet/data_new.jsonl
+/codesearchnet/dups_java.json
+/codesearchnet/dups_python.json
