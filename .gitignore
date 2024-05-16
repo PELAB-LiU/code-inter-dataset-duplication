@@ -302,3 +302,13 @@ representatives.json
 /statistics_codetrans.txt
 /statistics_python150.txt
 /statistics_tlc.txt
+
+.uuid
+/seq2seq/judgement.json
+/seq2seq/results_code2text.txt
+/seq2seq/results_codetrans.txt
+/seq2seq/results_codetrans_large.txt
+/seq2seq/results_codetrans_lora.txt
+/seq2seq/results_codetrans_prefix.txt
+/seq2seq/results_codetrans_small.txt
+/seq2seq/results_tlc.txt
