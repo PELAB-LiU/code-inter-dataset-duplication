@@ -2,16 +2,23 @@ from argparse import ArgumentParser
 
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, Trainer, \
-    DataCollatorForLanguageModeling
+    DataCollatorForLanguageModeling, AutoConfig, RobertaForMaskedLM
 
 
 def main(args):
     print(f'Base model {args.base_model}')
     print(f'Split {args.split}')
-    print(f'Split {args.checkpoint}')
-    model = AutoModelForCausalLM.from_pretrained(args.base_model)
+    print(f'Checkpoint {args.checkpoint}')
+    print(f'Dataset {args.dataset}')
+
     tokenizer = AutoTokenizer.from_pretrained(args.base_model, use_fast=True)
-    dataset = load_dataset("antolin/csn-interduplication")[args.split] #.select(range(0, 2000))
+    if not args.initialize_random:
+        model = AutoModelForCausalLM.from_pretrained(args.base_model)
+    else:
+        config = AutoConfig.from_pretrained(args.base_model)
+        config.num_hidden_layers = args.layers
+        model = RobertaForMaskedLM(config)
+    dataset = load_dataset(args.dataset)[args.split] #.select(range(0, 2000))
 
     def tokenize_function(examples):
         # codes = [' '.join(example) for example in examples["tokens"]]
@@ -32,18 +39,18 @@ def main(args):
 
     training_args = TrainingArguments(
         output_dir=args.checkpoint,
-        learning_rate=1e-4,
-        num_train_epochs=10,
+        learning_rate=5e-5,
+        num_train_epochs=20,
         push_to_hub=False,
         logging_strategy="steps",
-        save_strategy="steps",
+        save_strategy="epoch",
         logging_steps=100,
         max_grad_norm=1,
         load_best_model_at_end=False,
         seed=123,
-        weight_decay=0.01,
-        save_steps=20000,
-        evaluation_strategy="no"
+        # weight_decay=0.01,
+        evaluation_strategy="no",
+        per_device_train_batch_size=args.batch_size
     )
 
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm_probability=0.15, return_tensors="pt")
@@ -58,9 +65,14 @@ def main(args):
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Script for training mlm')
+    parser.add_argument('--dataset', choices=['antolin/csn-small-interduplication', 'antolin/csn-interduplication'],
+                        default='antolin/csn-small-interduplication')
     parser.add_argument('--split', choices=['biased', 'unbiased'], default='biased')
-    parser.add_argument('--checkpoint', default='/data/ja_models/pre-trained/roberta-biased')
+    parser.add_argument('--checkpoint', default='/data/ja_models/pre-trained/csn_big/roberta-biased')
     parser.add_argument('--base_model', default='roberta-base')
-    parser.add_argument('--block_size', default=512)
+    parser.add_argument('--initialize_random', action='store_true')
+    parser.add_argument('--block_size', default=512, type=int)
+    parser.add_argument('--batch_size', default=16, type=int)
+    parser.add_argument('--layers', default=12, type=int)
     args = parser.parse_args()
     main(args)

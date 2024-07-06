@@ -13,7 +13,7 @@ class ModelArguments:
     decoder: Optional[str] = field(default="microsoft/codebert-base")
     decoder_rand_layers: int = field(default=6)
     encoder_rand_layers: int = field(default=6)
-    telly: bool = field(default=False)
+    telly: int = field(default=None)
     lora: bool = field(default=False)
     prefix_tuning: bool = field(default=False)
     r: int = field(default=8)

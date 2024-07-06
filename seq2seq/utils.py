@@ -96,9 +96,6 @@ def load_model_tokenizers_seq2seq(args: ModelArguments):
         model.config.pad_token_id = tokenizer_target.pad_token_id
     else:
         raise NotImplementedError()
-    if args.telly:
-        for p in model.encoder.parameters():
-            p.requires_grad = False
     if args.lora:
         peft_config = LoraConfig(r=args.r, lora_alpha=args.alpha,
                                  lora_dropout=0.1, task_type=TaskType.SEQ_2_SEQ_LM,
@@ -108,6 +105,20 @@ def load_model_tokenizers_seq2seq(args: ModelArguments):
         peft_config = PrefixTuningConfig(task_type=TaskType.SEQ_2_SEQ_LM, inference_mode=False,
                                          num_virtual_tokens=20, prefix_projection=True)
         model = get_peft_model(model, peft_config)
+    if args.telly is not None:
+        for n, p in model.named_parameters():
+            if 'decoder.' in n:
+                p.requires_grad = False
+            if 'shared.weight' == n:
+                p.requires_grad = False
+            if n == 'decoder.final_layer_norm.weight':
+                p.requires_grad = False
+            for j in range(0, args.telly):
+                if f'encoder.block.{j}.' in n:
+                    p.requires_grad = False
+            if '.EncDecAttention.' in n:
+                p.requires_grad = True
+
     print_trainable_parameters(model)
     return model, tokenizer_source, tokenizer_target
 

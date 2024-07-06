@@ -44,6 +44,7 @@ def main(args):
     print(f'FULL: {np.mean(full) * 100:.2f} +- {np.std(full) * 100:.2f}')
     print(f'NO DUP: {np.mean(no_dup) * 100:.2f} +- {np.std(no_dup) * 100:.2f}')
     print(f'DUP: {np.mean(dup) * 100:.2f} +- {np.std(dup) * 100:.2f}')
+    print(f'DIFF: {(np.mean(dup) - np.mean(no_dup)) * 100:.2f}')
 
     if args.data_folder_control:
         _, control_dup, control_no_dup = get_avg_metrics(args.task, args.data_folder_control)
