@@ -303,6 +303,7 @@ representatives.json
 /statistics_python150.txt
 /statistics_tlc.txt
 
+
 .uuid
 /seq2seq/judgement.json
 /seq2seq/results_code2text.txt
@@ -312,3 +313,8 @@ representatives.json
 /seq2seq/results_codetrans_prefix.txt
 /seq2seq/results_codetrans_small.txt
 /seq2seq/results_tlc.txt
+
+/codesearchnet/data_new.jsonl
+/codesearchnet/dups_java.json
+/codesearchnet/dups_python.json
+
