@@ -1,4 +1,4 @@
-memorized
+remembered
 prediction:
 compute the union size of two bitsets .
 ground truth
@@ -22,7 +22,7 @@ public static int unionSize(long[] x,long[] y){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-memorized
+remembered
 prediction:
 converts to object array .
 ground truth
@@ -38,7 +38,7 @@ public static Long[] valuesOf(long[] array){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-memorized
+remembered
 prediction:
 receive notification of the end of an element .
 ground truth
@@ -81,7 +81,7 @@ public void endElement(String namespaceURI,String localName,String name) throws 
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-memorized
+remembered
 prediction:
 read a single character . this method will block until a character is available , an i / o error occurs , or the end of the stream is reached . < p / > < p > subclasses that intend to support efficient single - character input should override this method .
 ground truth
@@ -97,7 +97,7 @@ public int read() throws IOException {
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-memorized
+remembered
 prediction:
 reads a xml element attribute ans cast it to a int value
 ground truth
@@ -109,7 +109,7 @@ public int toInt(Element el,String attributeName){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-memorized
+remembered
 prediction:
 returns true if the input string contains a word .
 ground truth
@@ -129,7 +129,7 @@ public boolean containsWordBreakingChar(final @NonNull CharSequence input){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-memorized
+remembered
 prediction:
 process an attribute string of type t_char into a boolean value .
 ground truth
@@ -145,7 +145,7 @@ private Boolean processYESNO(StylesheetHandler handler,String uri,String name,St
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-memorized
+remembered
 prediction:
 returns an enumeration of the additional measure names .
 ground truth
@@ -159,7 +159,7 @@ public Enumeration<String> enumerateMeasures(){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-memorized
+remembered
 prediction:
 removes the element at the specified position in this list . shifts any subsequent elements to the left ( subtracts one from their indices ) . returns the element that was removed from the list .
 ground truth
@@ -177,7 +177,7 @@ public E remove(int index){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-partially memorized
+partially remembered
 prediction:
 converts a hexadecimal character to a hexadecimal string .
 ground truth
@@ -193,7 +193,7 @@ protected static int toDigit(final char ch,final int index) throws HexDecodeExce
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-partially memorized
+partially remembered
 prediction:
 creates a future that is completed with the given exception .
 ground truth
@@ -207,7 +207,7 @@ public static <T>CompletableFuture<T> exceptionallyCompletedFuture(Throwable thr
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-partially memorized
+partially remembered
 prediction:
 inserts a row into the buffer .
 ground truth
@@ -236,7 +236,7 @@ int insert(Row row,byte[] sourceBuffer,int sourceOffset,BlobOutputStream[] blobs
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-partially memorized
+partially remembered
 prediction:
 inserts all of the elements in the specified collection into this list , starting at the specified position . shifts the element currently at that position ( if any ) and any subsequent elements to the right ( increases their indices ) . the new elements will appear in this list in the order that they are returned by the specified collection ' s iterator .
 ground truth
@@ -254,7 +254,7 @@ public synchronized boolean addAll(Collection<? extends E> c){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-partially memorized
+partially remembered
 prediction:
 loads properties from a properties file .
 ground truth
@@ -273,7 +273,7 @@ private static Properties loadProperties(String propertiesFile){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-partially memorized
+partially remembered
 prediction:
 return a path for a path .
 ground truth
@@ -295,7 +295,7 @@ public Shape createCheckMark(final int x,final int y,final int w,final int h){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-partially memorized
+partially remembered
 prediction:
 returns the code attribute code .
 ground truth
@@ -312,7 +312,7 @@ public CodeAttribute createCode(){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-partially memorized
+partially remembered
 prediction:
 convert a java . sql . date to a java . sql . date
 ground truth
@@ -330,7 +330,7 @@ public static java.sql.Date toSqlDate(String date){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-partially memorized
+partially remembered
 prediction:
 returns the maximum of the two values .
 ground truth
@@ -355,7 +355,7 @@ public static double max(final double a,final double b){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-not memorized
+not remembered
 prediction:
 this method is called when the scheduler is started . it is called when the scheduler is started . if the scheduler is started , the scheduler is started , and the scheduler is started . if the scheduler is started , the scheduler is started , the scheduler is started , and the scheduler is started . if the scheduler is started , the scheduler is started , the scheduler is started , the scheduler is started , and the scheduler is started , the scheduler is started . if the scheduler is started , the scheduler is started , the scheduler is started , the scheduler is started , the scheduler is started , and the scheduler is started , the scheduler is started
 ground truth
@@ -381,7 +381,7 @@ public boolean onScheduleAsLibrary(Config config,Config runtime,IScheduler sched
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-not memorized
+not remembered
 prediction:
 determines whether the given component is an array of characters . if the component is an array of characters , this method returns true if the component is an array of characters . if the component is an array of characters , this method returns false if the component is an array of characters . if the component is an array of characters , this method returns true if the component is an array of characters . if the component is an array of characters , this method returns true if the component is an array of characters , this method returns false if the component is an array of characters . this method returns true if the component is an array of characters
 ground truth
@@ -401,7 +401,7 @@ protected boolean validate(final char[] component,final int soffset,int eoffset,
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-not memorized
+not remembered
 prediction:
 returns the enum class for the specified enum , if present , otherwise null .
 ground truth
@@ -423,7 +423,7 @@ snippet
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-not memorized
+not remembered
 prediction:
 copy the contents of the given inputstream to the given outputstream . closes the outputstream when done .
 ground truth
@@ -443,7 +443,7 @@ public static void copy(InputStream is,Resource out,boolean closeIS) throws IOEx
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-not memorized
+not remembered
 prediction:
 add a method to the list of parameters .
 ground truth
@@ -464,7 +464,7 @@ public void addParameters(final NameValuePair[] parameters){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-not memorized
+not remembered
 prediction:
 opens a file into a byte array . this method will block until the file is open , an i / o error occurs , or the i / o error occurs , or the end of the file is reached . < p / > this method will block until the file is open , an i / o error occurs , or the i / o error occurs , or the i / o error occurs , or the end of the file is reached . < p / > this method will block until the file is open , an i / o error occurs , or the i / o error occurs , or the end of the file is reached .
 ground truth
@@ -477,7 +477,7 @@ public ZipStreamImpl openReadImpl(PathImpl path) throws IOException {
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-not memorized
+not remembered
 prediction:
 paint the background of the button using the specified colors .
 ground truth
@@ -491,7 +491,7 @@ private void paintForegroundEnabled(Graphics2D g,int width,int height){
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-not memorized
+not remembered
 prediction:
 calculates the alpha value of a given extreme model .
 ground truth
@@ -547,7 +547,7 @@ private ExtremumType extremumType(int n,double[] alpha_extreme,HyperBoundingBox 
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-not memorized
+not remembered
 prediction:
 draws an arc at ( x , y ) , from ( x , y ) , to ( x , y ) , from ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x , y ) , to ( x
 ground truth

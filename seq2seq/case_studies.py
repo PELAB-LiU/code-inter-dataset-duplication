@@ -17,7 +17,7 @@ for i in range(len(references_dup_biased)):
     bleu_biased = nltk_sentence_bleu(predictions_dup_biased[i], references_dup_biased[i])
     if bleu_biased > 0.6:
         memorized.append(i)
-        print('memorized')
+        print('remembered')
         print('prediction:')
         print(' '.join(predictions_dup_biased[i]))
         print('ground truth')
@@ -35,7 +35,7 @@ for i in range(len(references_dup_biased)):
     bleu_biased = nltk_sentence_bleu(predictions_dup_biased[i], references_dup_biased[i])
     if 0.3 < bleu_biased < 0.6:
         half_memorized.append(i)
-        print('partially memorized')
+        print('partially remembered')
         print('prediction:')
         print(' '.join(predictions_dup_biased[i]))
         print('ground truth')
@@ -53,7 +53,7 @@ for i in range(len(references_dup_biased)):
     bleu_biased = nltk_sentence_bleu(predictions_dup_biased[i], references_dup_biased[i])
     if bleu_biased < 0.3:
         not_memorized.append(i)
-        print('not memorized')
+        print('not remembered')
         print('prediction:')
         print(' '.join(predictions_dup_biased[i]))
         print('ground truth')

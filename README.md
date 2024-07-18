@@ -87,6 +87,23 @@ python dataset_overlapping.py --lang java --save_inter_representatives --compute
 python upload_hf_dataset.py --data dataset_name/data.jsonl --inter dataset_name/interduplicates.json --rep dataset_name/representatives.json --hf_dataset hf_dir
 ```
 
+## Pre-training leaky and non-leaky LLMs
+
+To pre-train the leaky and non-leaky LLMs, you can use the scripts of the folder `pretraining`.
+```shell
+python pretraining/train_mlm.py --dataset antolin/csn-small-interduplication --split biased --checkpoint csn-small-biased-random-20 --base_model microsoft/unixcoder-base --initialize_random
+python pretraining/train_mlm.py --dataset antolin/csn-small-interduplication --split unbiased --checkpoint csn-small-unbiased-random-20 --base_model microsoft/unixcoder-base --initialize_random
+
+python pretraining/train_bimodal_dual.py --dataset antolin/csn-small-interduplication --split biased --checkpoint csn-small-biased-random-encoder-decoder-20 --base_model Salesforce/codet5-base
+python pretraining/train_bimodal_dual.py --dataset antolin/csn-small-interduplication --split unbiased --checkpoint csn-small-unbiased-random-encoder-decoder-20 --base_model Salesforce/codet5-base
+```
+
+The pre-trained models used in our paper are available at:
+* (Leaky encoder) https://huggingface.co/antolin/csn-small-biased-random-20
+* (Non-leaky encoder) https://huggingface.co/antolin/csn-small-unbiased-random-20
+* (Leaky encoder-decoder) https://huggingface.co/antolin/csn-small-biased-random-encoder-decoder-20
+* (Non-leaky encoder-decoder) https://huggingface.co/antolin/csn-small-unbiased-random-encoder-decoder-20
+
 ## Running fine-tuning procedures
 
 These are the scripts used for fine-tuning our LLMs. They use the HF datasets: antolin/tlc_interduplication,
