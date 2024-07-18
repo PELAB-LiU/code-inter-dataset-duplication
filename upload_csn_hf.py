@@ -89,6 +89,6 @@ if __name__ == '__main__':
     parser.add_argument('--target_dataset', type=str, default='codesearchnet')
     parser.add_argument('--first_stage', action='store_true')
     parser.add_argument('--hf_dataset', type=str, required=False)
-    parser.add_argument('--samples', type=int, default=800_000)
+    parser.add_argument('--samples', type=int, default=100_000)
     args = parser.parse_args()
     main(args)

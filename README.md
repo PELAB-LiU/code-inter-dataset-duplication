@@ -74,7 +74,7 @@ python dataset_overlapping.py --lang java|python
 
 ## Upload datasets to HF
 
-To upload datasets to Hugging Face's hub, perform the following steps:
+To upload the fine-tuning datasets to Hugging Face's hub, perform the following steps:
 
 1. Compute inter-dataset duplication percentages and save representative data.
 ```shell
@@ -86,6 +86,28 @@ python dataset_overlapping.py --lang java --save_inter_representatives --compute
 ```shell
 python upload_hf_dataset.py --data dataset_name/data.jsonl --inter dataset_name/interduplicates.json --rep dataset_name/representatives.json --hf_dataset hf_dir
 ```
+
+To build and upload to HF our small pre-training datasets (leaky and non-leaky), perform the following steps:
+
+1. Compute the samples that are included in CSN and are included in the fine-tuning datasets:
+```shell
+python get_pretraining.py --lang java
+python get_pretraining.py --lang python
+```
+
+2. Filter those samples that contain encoding errors and that have no nl documentation associated.
+```shell
+python upload_csn_hf.py --first_stage
+```
+
+3. Perform the sampling strategy described in the paper and upload the dataset to HF.
+```shell
+python upload_csn_hf.py --hf_dataset antolin/csn-small-interduplication --samples 100_000
+```
+
+The dataset used in our paper to pre-train the models can be found in https://huggingface.co/datasets/antolin/csn-small-interduplication.
+This dataset contains two splits: unbiased (non-leaky pre-training dataset) and biased (leaky pre-training dataset).
+
 
 ## Pre-training leaky and non-leaky LLMs
 
