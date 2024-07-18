@@ -89,7 +89,7 @@ python upload_hf_dataset.py --data dataset_name/data.jsonl --inter dataset_name/
 
 ## Running fine-tuning procedures
 
-These are the scripts used for fine-tuning LLMs. They use the HF datasets: antolin/tlc_interduplication,
+These are the scripts used for fine-tuning our LLMs. They use the HF datasets: antolin/tlc_interduplication,
 antolin/python-150_interduplication, and antolin/codetrans-interduplication.
 
 ### Code summarization and code translation tasks
@@ -98,33 +98,55 @@ antolin/python-150_interduplication, and antolin/codetrans-interduplication.
 cd seq2seq
 ```
 
-Code translation (CodeT5-base and control models):
+Code translation:
 ```shell
-./train_models_codetrans.sh .
-./train_models_codetrans_control_models.sh .
+./script_b_ub/train_models_codetrans_biased.sh .
+./script_b_ub/train_models_codetrans_unbiased.sh .
+
+./script_b_ub/train_models_codetrans_biased_lora.sh .
+./script_b_ub/train_models_codetrans_unbiased_lora.sh .
+
+./script_b_ub/train_models_codetrans_biased_prefix.sh .
+./script_b_ub/train_models_codetrans_unbiased_prefix.sh .
 ```
 
-Code summarization using Python-150 and TLC (CodeT5-small, base, large, control models, lora, and prefix tuning):
-
+Code summarization using Python-150:
 ```shell
-./train_models_code2seq-python-150.sh .
-./train_models_code2seq-python-150_control_models.sh .
-./train_models_code2seq-python-150_peft.sh .
+./script_b_ub/train_models_code2seq-python-150_biased_model.sh .
+./script_b_ub/train_models_code2seq-python-150_unbiased_model.sh .
 
-./train_models_code2seq-tlc.sh .
-./train_models_code2seq-tlc_control_models.sh .
-./train_models_code2seq-tlc_peft.sh .
+./script_b_ub/train_models_code2seq-python-150_biased_model_lora.sh .
+./script_b_ub/train_models_code2seq-python-150_unbiased_model_lora.sh .
+
+./script_b_ub/train_models_code2seq-python-150_biased_model_prefix.sh .
+./script_b_ub/train_models_code2seq-python-150_unbiased_model_prefix.sh .
+```
+
+Code summarization using TLC:
+```shell
+./script_b_ub/train_models_code2seq-tlc_biased_model.sh .
+./script_b_ub/train_models_code2seq-tlc_unbiased_model.sh .
+
+./script_b_ub/train_models_code2seq-tlc_biased_model_lora.sh .
+./script_b_ub/train_models_code2seq-tlc_unbiased_model_lora.sh .
+
+./script_b_ub/train_models_code2seq-tlc_biased_model_prefix.sh .
+./script_b_ub/train_models_code2seq-tlc_unbiased_model_prefix.sh .
+```
+
+To get the csvs (one per dataset) with the results, just run:
+```shell
+python extract_results_un_biased.py --folder ./code2text/ --task code2text --lang python --output code2text_un_biased.csv
+python extract_results_un_biased.py --folder ./code2text_tlc/ --task code2text --lang java --output code2text_tlc_un_biased.csv
+python extract_results_un_biased.py --folder ./codetrans/ --task codetrans --lang java --output code2trans_un_biased.csv
 ```
 
 ### Code search
 
-Code search using Python-150 (CodeBERT, GraphCodeBERT, UnixCoder, control models, lora, and prefix tuning):
-```shell
-cd codesearch
-./train_models_python-150.sh 
-```
+TODO
 
-Layer-wise analysis:
-```shell
-./train_models_python-150_telly.sh 
-```
+
+## Case studies
+
+More examples of samples that are fully remembered, partially remembered, and not remembered 
+can be found in `seq2seq/case_studies.txt`.
