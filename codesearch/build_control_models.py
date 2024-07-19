@@ -1,8 +1,7 @@
 import argparse
 
-from transformers import AutoConfig, RobertaModel, AutoTokenizer
-
 from train import set_seed
+from transformers import AutoConfig, AutoTokenizer, RobertaModel
 
 
 def main(args):

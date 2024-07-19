@@ -45,10 +45,9 @@ correlation_plot = (
     labs(title=f'Correlation: {correlation:.2f}')
 )
 
-for model in ['codebert', 'unixcoder', 'graphcodebert']:
-    df_fil = df[df["Model"] == model]
-    print(f'Pearson {model}: {pearsonr(df_fil["Layer"], df_fil["Bias"])}')
-    print(f'Spearmanr {model}: {spearmanr(df_fil["Layer"], df_fil["Bias"])}')
+
+print(f'Pearson: {pearsonr(tellies_scatter, biases)}')
+print(f'Spearmanr: {spearmanr(tellies_scatter, biases)}')
 
 correlation_plot.save(filename='correlation_plot.png')
 

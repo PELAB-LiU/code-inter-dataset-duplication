@@ -1,4 +1,4 @@
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 
@@ -7,6 +7,9 @@ class ModelArguments:
     model_name_or_path: Optional[str] = field(default="microsoft/codebert-base")
     checkpoint: str = field(default=None)
     is_baseline: bool = field(default=False)
+    # Only active if is_baseline is true
+    num_layers: int = field(default=6)
+    
     telly: int = field(default=0)
     lora: bool = field(default=False)
     prefix_tuning: bool = field(default=False)

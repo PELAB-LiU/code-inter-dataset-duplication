@@ -182,8 +182,30 @@ python extract_results_un_biased.py --folder ./codetrans/ --task codetrans --lan
 
 ### Code search
 
-TODO
+First, go to the code search folder:
+```shell
+cd code_search
+```
 
+Then, run the following scripts:
+```shell
+./scripts/train_models_codesearch_biased.sh
+./scripts/train_models_codesearch_unbiased.sh
+./scripts/train_models_codesearch_layerwise_biased.sh
+./scripts/train_models_codesearch_layerwise_unbiased.sh
+```
+
+Pre-trained models can also be trained for the layerwise setting
+```shell
+./scripts/train_models_codesearch_layerwise_pretrained.sh <model_name>
+```
+Replace `<model_name>` with the name of the pre-trained model in the paper, such as `microsoft/unixcoder-base`.
+
+To get the csvs (one per dataset) with the results, just run:
+```shell
+python measure_performance.py --path ./results/ --output codesearch.csv
+python measure_performance_layerwise.py --path ./results/ --output codesearch_layerwise.csv
+```
 
 ## Case studies
 
