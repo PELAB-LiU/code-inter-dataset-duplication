@@ -102,10 +102,10 @@ python upload_csn_hf.py --first_stage
 
 3. Perform the sampling strategy described in the paper and upload the dataset to HF.
 ```shell
-python upload_csn_hf.py --hf_dataset antolin/csn-small-interduplication --samples 100_000
+python upload_csn_hf.py --hf_dataset PELAB-LiU/csn-small-interduplication --samples 100_000
 ```
 
-The dataset used in our paper to pre-train the models can be found in https://huggingface.co/datasets/antolin/csn-small-interduplication.
+The dataset used in our paper to pre-train the models can be found in https://huggingface.co/datasets/PELAB-LiU/csn-small-interduplication.
 This dataset contains two splits: unbiased (non-leaky pre-training dataset) and biased (leaky pre-training dataset).
 
 
@@ -113,23 +113,23 @@ This dataset contains two splits: unbiased (non-leaky pre-training dataset) and 
 
 To pre-train the leaky and non-leaky LLMs, you can use the scripts of the folder `pretraining`.
 ```shell
-python pretraining/train_mlm.py --dataset antolin/csn-small-interduplication --split biased --checkpoint csn-small-biased-random-20 --base_model microsoft/unixcoder-base --initialize_random
-python pretraining/train_mlm.py --dataset antolin/csn-small-interduplication --split unbiased --checkpoint csn-small-unbiased-random-20 --base_model microsoft/unixcoder-base --initialize_random
+python pretraining/train_mlm.py --dataset PELAB-LiU/csn-small-interduplication --split biased --checkpoint csn-small-biased-random-20 --base_model microsoft/unixcoder-base --initialize_random
+python pretraining/train_mlm.py --dataset PELAB-LiU/csn-small-interduplication --split unbiased --checkpoint csn-small-unbiased-random-20 --base_model microsoft/unixcoder-base --initialize_random
 
-python pretraining/train_bimodal_dual.py --dataset antolin/csn-small-interduplication --split biased --checkpoint csn-small-biased-random-encoder-decoder-20 --base_model Salesforce/codet5-base
-python pretraining/train_bimodal_dual.py --dataset antolin/csn-small-interduplication --split unbiased --checkpoint csn-small-unbiased-random-encoder-decoder-20 --base_model Salesforce/codet5-base
+python pretraining/train_bimodal_dual.py --dataset PELAB-LiU/csn-small-interduplication --split biased --checkpoint csn-small-biased-random-encoder-decoder-20 --base_model Salesforce/codet5-base
+python pretraining/train_bimodal_dual.py --dataset PELAB-LiU/csn-small-interduplication --split unbiased --checkpoint csn-small-unbiased-random-encoder-decoder-20 --base_model Salesforce/codet5-base
 ```
 
 The pre-trained models used in our paper are available at:
-* (Leaky encoder) https://huggingface.co/antolin/csn-small-biased-random-20
-* (Non-leaky encoder) https://huggingface.co/antolin/csn-small-unbiased-random-20
-* (Leaky encoder-decoder) https://huggingface.co/antolin/csn-small-biased-random-encoder-decoder-20
-* (Non-leaky encoder-decoder) https://huggingface.co/antolin/csn-small-unbiased-random-encoder-decoder-20
+* (Leaky encoder) https://huggingface.co/PELAB-LiU/csn-small-biased-random-20
+* (Non-leaky encoder) https://huggingface.co/PELAB-LiU/csn-small-unbiased-random-20
+* (Leaky encoder-decoder) https://huggingface.co/PELAB-LiU/csn-small-biased-random-encoder-decoder-20
+* (Non-leaky encoder-decoder) https://huggingface.co/PELAB-LiU/csn-small-unbiased-random-encoder-decoder-20
 
 ## Running fine-tuning procedures
 
-These are the scripts used for fine-tuning our LLMs. They use the HF datasets: antolin/tlc_interduplication,
-antolin/python-150_interduplication, and antolin/codetrans-interduplication.
+These are the scripts used for fine-tuning our LLMs. They use the HF datasets: PELAB-LiU/tlc_interduplication,
+PELAB-LiU/python-150_interduplication, and PELAB-LiU/codetrans-interduplication.
 
 ### Code summarization and code translation tasks
 
